@@ -1,6 +1,6 @@
 <div align="center"><img src="docs/img/Ibuki logo.png" alt="Ibuki" height="256px"></img></div>
 <h1 align="center">Ibuki</h1>
-<p align="center">An ultimate, fully customizable Booru browser app for. Now in your phone.</p>
+<p align="center">An ultimate, fully customizable Booru browser app. Now in your phone.</p>
 
 ---
 ## What is the difference?
