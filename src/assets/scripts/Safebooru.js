@@ -13,8 +13,17 @@ const Extension = {
 
 /// Helpers
 
-function MakeTagsFromTagsString(string, separator) {
-    return string.split(separator)
+function MakeTagsFromTagsString(string, separator, space, type) {
+    if (string == "" || string == null || string == undefined) return null
+    let tags = string.split(separator)
+    if (tags.length == 0) return null
+    return tags.map((tag) => { 
+        return { 
+            Name: tag, 
+            DisplayName: tag.replaceAll(space, " "), 
+            Category: type
+        } 
+    })
 }
 
 function ParsePostJSON(json) {
@@ -32,13 +41,13 @@ function ParsePostJSON(json) {
             OriginalFileURL: json.file_url,
             DirectURL: url({base: Extension.base_url, path: `posts/${json.id}`}),
             Tags: {
-                CopyrightTags: MakeTagsFromTagsString(json.tag_string_copyright, Extension.tags_separator),
-                CharacterTags: MakeTagsFromTagsString(json.tag_string_character, Extension.tags_separator),
+                CopyrightTags: MakeTagsFromTagsString(json.tag_string_copyright, Extension.tags_separator, "_", "copyright"),
+                CharacterTags: MakeTagsFromTagsString(json.tag_string_character, Extension.tags_separator, "_", "character"),
                 SpeciesTags: null,
-                ArtistTags: MakeTagsFromTagsString(json.tag_string_artist, Extension.tags_separator),
+                ArtistTags: MakeTagsFromTagsString(json.tag_string_artist, Extension.tags_separator, "_", "artist"),
                 LoreTags: null,
-                GeneralTags: MakeTagsFromTagsString(json.tag_string_general, Extension.tags_separator),
-                MetaTags: MakeTagsFromTagsString(json.tag_string_meta, Extension.tags_separator)
+                GeneralTags: MakeTagsFromTagsString(json.tag_string_general, Extension.tags_separator, "_", "general"),
+                MetaTags: MakeTagsFromTagsString(json.tag_string_meta, Extension.tags_separator, "_", "meta")
             },
             Information: {
                 UploaderID: json.uploader_id,
@@ -52,6 +61,7 @@ function ParsePostJSON(json) {
                 HasChildren: json.has_children,
                 CreatedAt: json.created_at,
                 UploadedAt: json.updated_at,
+                Rating: json.rating,
                 FileExtension: json.file_ext,
                 FileSize: json.file_size,
                 ImageWidth: json.image_width,
@@ -76,13 +86,25 @@ function ParsePostsJSON(json) {
     return result
 }
 
+function ConvertTagCategory(category) {
+    switch (category) {
+        case "0": case 0: return "general"
+        case "1": case 1: return "artist"
+        case "3": case 3: return "copyright"
+        case "4": case 4: return "character"
+        case "5": case 5: return "meta"
+        default: return "unknown"
+    }
+}
+
 function ParseTagJSON(json) {
     try {
         if (typeof(json) !== typeof(JSON)) json = JSON.parse(json) 
 
         return {
-            Tag: json.name,
-            Category: json.category,
+            Name: json.name,
+            DisplayName: json.name.replace("_", " "),
+            Category: ConvertTagCategory(json.category),
         }
 
     } catch (_) {

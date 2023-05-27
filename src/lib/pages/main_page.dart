@@ -43,7 +43,14 @@ class MainPage extends HookWidget {
 
         final List<Widget> pages = <Widget>[
             DashboardPage(activeBooru: settings.boorus[activeBooru.value], search: search.value),
-            DashboardPage(activeBooru: settings.boorus[activeBooru.value], search: "ordfav:lilystilson"),
+            // TODO: Following page
+            // TODO: Add ability to follow certain tags
+            // TODO: OR every followed tag's result images
+
+            //? Question tho, should it be bound to a single booru,
+            //? or should it be able to track what tags were followed and
+            //? then just combine everything?
+            DashboardPage(activeBooru: settings.boorus[activeBooru.value], search: "rating:g"),
             SettingsPage(settings: settings)
         ];
 
@@ -62,10 +69,9 @@ class MainPage extends HookWidget {
                 key: ObjectKey(tag),
                 tag: tag
             ), 
-            suggestionBuilder: (context, tag) => ListTile(
+            suggestionBuilder: (context, tag) => TagListTile(
                 key: ObjectKey(tag),
-                title: Text(tag.tagDisplay()),
-                subtitle: Text(tag.tagName),
+                tag: tag,
             ),
             findSuggestions: (String query) async {
                 if (query.isNotEmpty) {
