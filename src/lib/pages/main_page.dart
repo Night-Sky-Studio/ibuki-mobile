@@ -62,10 +62,9 @@ class MainPage extends HookWidget {
                 key: ObjectKey(tag),
                 tag: tag
             ), 
-            suggestionBuilder: (context, tag) => ListTile(
+            suggestionBuilder: (context, tag) => TagListTile(
                 key: ObjectKey(tag),
-                title: Text(tag.tagDisplay()),
-                subtitle: Text(tag.tagName),
+                tag: tag,
             ),
             findSuggestions: (String query) async {
                 if (query.isNotEmpty) {

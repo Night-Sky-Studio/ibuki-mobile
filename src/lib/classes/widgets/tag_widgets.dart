@@ -83,6 +83,48 @@ class TagTheme {
 //     const Tag(this.tag, this.type);
 // }
 
+class TagListTile extends ListTile {
+    final Tag tag;
+    final TagTheme? theme;
+
+    const TagListTile({super.key, required this.tag, this.theme});
+    
+    _makeTile(Color color) {
+        return ListTile(
+            title: Text(tag.tagDisplay(), style: TextStyle(color: color)),
+            visualDensity: VisualDensity.compact,
+        );
+    }
+
+    @override
+    Widget build(BuildContext context) {
+        final TagTheme theme = this.theme ?? TagTheme.standard();
+
+        switch(tag.type) {
+            case TagType.copyright:
+                return _makeTile(theme.copyrightTagColor);
+            case TagType.general:
+                return _makeTile(theme.generalTagColor);
+            case TagType.artist:
+                return _makeTile(theme.artistTagColor);
+            case TagType.character:
+                return _makeTile(theme.characterTagColor);
+            case TagType.species:
+                return _makeTile(theme.speciesTagColor);
+            case TagType.meta:
+                return _makeTile(theme.metaTagColor);
+            case TagType.lore:
+                return _makeTile(theme.loreTagColor);
+            case TagType.pool:
+                return _makeTile(theme.poolTagColor);
+            case TagType.unknown:
+                return _makeTile(theme.unknownTagColor);
+            default:
+                return _makeTile(theme.unknownTagColor);
+        }
+    }
+}
+
 class TagChip extends StatelessWidget {
     final Tag tag;
     final TagTheme? theme;
