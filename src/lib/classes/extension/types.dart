@@ -82,6 +82,7 @@ class Tags {
     List<Tag>? loreTags;
     List<Tag>? generalTags;
     List<Tag>? metaTags;
+    List<Tag>? poolTags;
     List<Tag>? invalidTags;
 
     Tags({
@@ -92,11 +93,12 @@ class Tags {
         this.loreTags,
         this.generalTags,
         this.metaTags,
+        this.poolTags,
         this.invalidTags
     });
 
     @override
-    String toString() => "Tags(copyrightTags: $copyrightTags, characterTags: $characterTags, speciesTags: $speciesTags, artistTags: $artistTags, loreTags: $loreTags, generalTags: $generalTags, metaTags: $metaTags, invalidTags: $invalidTags)";
+    String toString() => "Tags(copyrightTags: $copyrightTags, characterTags: $characterTags, speciesTags: $speciesTags, artistTags: $artistTags, loreTags: $loreTags, generalTags: $generalTags, metaTags: $metaTags, poolTags: $poolTags, invalidTags: $invalidTags)";
 }
 
 class Score {
