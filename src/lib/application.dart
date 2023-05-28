@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ibuki/classes/settings.dart';
-import 'Pages/main_page.dart';
+import 'package:ibuki/pages/main_page.dart';
 
 class Application extends StatelessWidget {
     const Application({super.key, required this.settings});
