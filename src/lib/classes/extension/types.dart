@@ -38,7 +38,7 @@ abstract class ExtensionObject {
 }
 
 enum TagType {
-    general, artist, copyright, character, meta, lore, species, pool, unknown,
+    general, artist, copyright, character, meta, lore, species, unknown,
 }
 
 class Tag extends ExtensionObject {

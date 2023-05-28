@@ -10,7 +10,6 @@ class TagTheme {
     final Color speciesTagColor;
     final Color metaTagColor;
     final Color loreTagColor;
-    final Color poolTagColor;
     final Color unknownTagColor;
 
     const TagTheme({
@@ -21,7 +20,6 @@ class TagTheme {
         required this.speciesTagColor, 
         required this.metaTagColor, 
         required this.loreTagColor, 
-        required this.poolTagColor,
         required this.unknownTagColor
     });
 
@@ -35,26 +33,19 @@ class TagTheme {
             speciesTagColor: Colors.deepOrange,
             metaTagColor: Colors.orange,
             loreTagColor: Colors.lightGreen,
-
-            // Colors.pink[200]!
-            // This is stupid. Colors are constant values,
-            // but here I can't use `Colors.pink[200]`, because for some reason it
-            // is not constant. 
-            poolTagColor: Color(0xFFF48FB1), 
             unknownTagColor: Colors.grey
         );
     }
 
     factory TagTheme.danbooru() {
         return const TagTheme(
-            generalTagColor:  Color(0xff009be6),
+            generalTagColor: Color(0xff009be6),
             artistTagColor: Color(0xffff8a8b),
             copyrightTagColor: Colors.purple,
             characterTagColor: Colors.green,
             speciesTagColor: Colors.grey,
             metaTagColor: Colors.orange,
             loreTagColor: Colors.grey,
-            poolTagColor: Colors.grey,
             unknownTagColor: Colors.grey
         );
     }
@@ -68,7 +59,6 @@ class TagTheme {
             speciesTagColor: Color(0xffed5d1f),
             metaTagColor: Color(0xffffffff),
             loreTagColor: Color(0xff228822),
-            poolTagColor: Color(0xfff5deb3),
             unknownTagColor: Color(0xffff3d3d),
         );
     }
@@ -115,8 +105,6 @@ class TagListTile extends ListTile {
                 return _makeTile(theme.metaTagColor);
             case TagType.lore:
                 return _makeTile(theme.loreTagColor);
-            case TagType.pool:
-                return _makeTile(theme.poolTagColor);
             case TagType.unknown:
                 return _makeTile(theme.unknownTagColor);
             default:
@@ -162,8 +150,6 @@ class TagChip extends StatelessWidget {
                 return _makeChip(theme.metaTagColor);
             case TagType.lore:
                 return _makeChip(theme.loreTagColor);
-            case TagType.pool:
-                return _makeChip(theme.poolTagColor);
             case TagType.unknown:
                 return _makeChip(theme.unknownTagColor);
             default:
@@ -174,16 +160,32 @@ class TagChip extends StatelessWidget {
 
 class TagsList extends StatelessWidget {
     final String title;
-    final List<String> tags;
-    final Color? color;
+    final List<Tag>? tags;
+    final TagType type;
 
-    const TagsList({super.key, required this.title, required this.tags, this.color});
+    const TagsList({super.key, required this.title, required this.tags, required this.type});
 
     @override
     Widget build(BuildContext context) {
-        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Padding(padding: const EdgeInsets.only(left: 16, right: 16, top: 16), child: Text(style: Theme.of(context).textTheme.headlineSmall, title)),
-            Padding(padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8), child: Wrap(alignment: WrapAlignment.start, spacing: 8, runSpacing: 8, children: tags.map((e) => Chip(label: Text(e), backgroundColor: color, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap)).toList()))
-        ]);
+        if (tags == null || tags!.isEmpty) return Container();
+
+        return Column(
+            crossAxisAlignment: CrossAxisAlignment.start, 
+            children: [
+                Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16, top: 16), 
+                    child: Text(style: Theme.of(context).textTheme.headlineSmall, title)
+                ),
+                Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8), 
+                    child: Wrap(
+                        alignment: WrapAlignment.start, 
+                        spacing: 8, 
+                        runSpacing: 8, 
+                        children: tags?.map((tag) => TagChip(tag: tag)).toList() ?? []
+                    )
+                )
+            ]
+        );
     }
 }
