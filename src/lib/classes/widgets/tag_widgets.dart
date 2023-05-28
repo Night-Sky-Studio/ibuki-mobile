@@ -10,7 +10,7 @@ class TagTheme {
     final Color speciesTagColor;
     final Color metaTagColor;
     final Color loreTagColor;
-    final Color unknownTagColor;
+    final Color invalidTagColor;
 
     const TagTheme({
         required this.generalTagColor, 
@@ -20,7 +20,7 @@ class TagTheme {
         required this.speciesTagColor, 
         required this.metaTagColor, 
         required this.loreTagColor, 
-        required this.unknownTagColor
+        required this.invalidTagColor
     });
 
     /// [dart-lang/language#1296](https://github.com/dart-lang/language/issues/1296)
@@ -33,7 +33,7 @@ class TagTheme {
             speciesTagColor: Colors.deepOrange,
             metaTagColor: Colors.orange,
             loreTagColor: Colors.lightGreen,
-            unknownTagColor: Colors.grey
+            invalidTagColor: Colors.grey
         );
     }
 
@@ -46,7 +46,7 @@ class TagTheme {
             speciesTagColor: Colors.grey,
             metaTagColor: Colors.orange,
             loreTagColor: Colors.grey,
-            unknownTagColor: Colors.grey
+            invalidTagColor: Colors.grey
         );
     }
 
@@ -59,7 +59,7 @@ class TagTheme {
             speciesTagColor: Color(0xffed5d1f),
             metaTagColor: Color(0xffffffff),
             loreTagColor: Color(0xff228822),
-            unknownTagColor: Color(0xffff3d3d),
+            invalidTagColor: Color(0xffff3d3d),
         );
     }
 }
@@ -105,10 +105,10 @@ class TagListTile extends ListTile {
                 return _makeTile(theme.metaTagColor);
             case TagType.lore:
                 return _makeTile(theme.loreTagColor);
-            case TagType.unknown:
-                return _makeTile(theme.unknownTagColor);
+            case TagType.invalid:
+                return _makeTile(theme.invalidTagColor);
             default:
-                return _makeTile(theme.unknownTagColor);
+                return _makeTile(theme.invalidTagColor);
         }
     }
 }
@@ -150,10 +150,10 @@ class TagChip extends StatelessWidget {
                 return _makeChip(theme.metaTagColor);
             case TagType.lore:
                 return _makeChip(theme.loreTagColor);
-            case TagType.unknown:
-                return _makeChip(theme.unknownTagColor);
+            case TagType.invalid:
+                return _makeChip(theme.invalidTagColor);
             default:
-                return _makeChip(theme.unknownTagColor);
+                return _makeChip(theme.invalidTagColor);
         }
     }
 }
@@ -161,9 +161,8 @@ class TagChip extends StatelessWidget {
 class TagsList extends StatelessWidget {
     final String title;
     final List<Tag>? tags;
-    final TagType type;
 
-    const TagsList({super.key, required this.title, required this.tags, required this.type});
+    const TagsList({super.key, required this.title, required this.tags});
 
     @override
     Widget build(BuildContext context) {
