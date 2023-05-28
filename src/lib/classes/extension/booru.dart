@@ -11,7 +11,7 @@ import 'package:ibuki/classes/extension/types.dart';
 class Booru extends Extension {
     final JavascriptRuntime _runtime = getJavascriptRuntime();
 
-    static const _internalJsCode = """const UserAgent="Aster/1.0.0 Ibuki/1.0.0";function url(t){let e="";if(t.base&&(e+=t.base,t.base.endsWith("/")||(e+="/")),t.path&&(t.path.startsWith("/")?e+=t.path.substring(1):e+=t.path,t.path.endsWith("/")&&(e=e.substring(0,e.length-1))),t.query){for(let s of(e+="?",t.query)){let n=Object.entries(s)[0];""!==n[1]&&(e+=n[0]+"="+n[1]+"&")}e=e.substring(0,e.length-1)}return e}""";
+    static const _internalJsCode = """const UserAgent="IbukiMobile/1.0.0 Ibuki/1.0.0 (Night Sky Studio)";function url(t){let e="";if(t.base&&(e+=t.base,t.base.endsWith("/")||(e+="/")),t.path&&(t.path.startsWith("/")?e+=t.path.substring(1):e+=t.path,t.path.endsWith("/")&&(e=e.substring(0,e.length-1))),t.query){for(let s of(e+="?",t.query)){let n=Object.entries(s)[0];""!==n[1]&&(e+=n[0]+"="+n[1]+"&")}e=e.substring(0,e.length-1)}return e}""";
 
     Booru(String script) {
         // Add url() function
