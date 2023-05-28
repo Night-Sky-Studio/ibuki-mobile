@@ -9,6 +9,7 @@ import 'package:ibuki/classes/extension/booru_post.dart';
 import 'package:ibuki/classes/extension/types.dart';
 import 'package:ibuki/classes/helpers.dart';
 import 'package:ibuki/classes/settings.dart';
+import 'package:ibuki/classes/widgets/search_appbar.dart';
 import 'package:ibuki/classes/widgets/tag_widgets.dart';
 import 'package:ibuki/pages/dashboard_page.dart';
 import 'package:ibuki/pages/settings_page.dart';
@@ -23,22 +24,19 @@ class MainPage extends HookWidget {
         return Image.memory(const Base64Decoder().convert(icon));
     }
 
-    Future<List<Tag>?> _searchTag(String query) async {
-        final booru = settings.activeBooru;
-        final tags = await booru.getTagSuggestion(search: query, limit: 10);
-        return tags;
-    }
 
-    List<Tag> searchQuery = [];
+
+    
 
     @override
     Widget build(BuildContext context) {
         final selectedIndex = useState(0);
         // find index of active booru using id from settings and list of loaded boorus
         final activeBooru = useState(settings.boorus.indexWhere((element) => element.id == settings.activeBooruId));
-        final title = useState(settings.boorus[activeBooru.value].name ?? "Ibuki");
-        final searchActive = useState(false);
+
+        final title = useState(settings.activeBooru.name ?? "Ibuki");
         final search = useState("");
+
         final debugString = useState("");
 
         final List<Widget> pages = <Widget>[
@@ -56,57 +54,18 @@ class MainPage extends HookWidget {
 
         // const knownBoorus 
 
-        void searchFinished() {
-            if (searchActive.value) {
-                title.value = Tag.tagListToString(searchQuery);
-                search.value = Tag.tagListToString(searchQuery);
-            }
-            searchActive.value = !searchActive.value;
-        }
-
-        final chipInput = ChipsInput<Tag>(
-            chipBuilder: (context, state, tag) => TagChip(
-                key: ObjectKey(tag),
-                tag: tag
-            ), 
-            suggestionBuilder: (context, tag) => TagListTile(
-                key: ObjectKey(tag),
-                tag: tag,
-            ),
-            findSuggestions: (String query) async {
-                if (query.isNotEmpty) {
-                    final results = await _searchTag(query.toLowerCase()) ?? [];
-                    return results;
-                }
-                return [];
-            },
-            initialValue: searchQuery,
-            onChanged: (value) => searchQuery = value,
-            onEditingComplete: searchFinished,
-        );
-
         return Scaffold(
-            appBar: AppBar(
-                title: searchActive.value ? chipInput : Text(title.value),
-                actions: [
-                    IconButton(
-                        onPressed: searchFinished,
-                        icon: const Icon(Icons.search)
-                    ),
-                    Visibility(
-                        visible: search.value.isNotEmpty || searchActive.value,
-                        child: IconButton(
-                            onPressed: () {
-                                searchActive.value = false;
-                                searchQuery = [];
-                                search.value = "";
-                                title.value = settings.boorus[activeBooru.value].name ?? "Ibuki";
-                            }, 
-                            icon: const Icon(Icons.close)
-                        )
-                    )
-                ],
-                backgroundColor: searchActive.value ? Theme.of(context).colorScheme.background : null,
+            appBar: SearchAppBar(
+                title: title.value, 
+                settings: settings, 
+                onSearch: (context, tags) {
+                    search.value = Tag.tagListToString(tags);
+                    title.value = Tag.tagListToString(tags);
+                },
+                onSearchClear: (context) {
+                    search.value = "";
+                    title.value = settings.activeBooru.name ?? "Ibuki";
+                }
             ),
             body: Center(
                 child: pages.elementAt(selectedIndex.value),
@@ -125,7 +84,7 @@ class MainPage extends HookWidget {
                     if (index == 2) {
                         title.value = "Settings";
                     } else {
-                        title.value = settings.boorus[activeBooru.value].name!;
+                        title.value = settings.activeBooru.name ?? "Ibuki";
                     }
                 },
             ),

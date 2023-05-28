@@ -8,6 +8,7 @@ const Extension = {
     tags_separator: " ",
     rate_limit: 10,
     network_access: true,
+    version: "1.0.0",
     icon: "https://danbooru.donmai.us/packs/static/images/danbooru-logo-128x128-ea111b6658173e847734.png"
 }
 
@@ -47,7 +48,8 @@ function ParsePostJSON(json) {
                 ArtistTags: MakeTagsFromTagsString(json.tag_string_artist, Extension.tags_separator, "_", "artist"),
                 LoreTags: null,
                 GeneralTags: MakeTagsFromTagsString(json.tag_string_general, Extension.tags_separator, "_", "general"),
-                MetaTags: MakeTagsFromTagsString(json.tag_string_meta, Extension.tags_separator, "_", "meta")
+                MetaTags: MakeTagsFromTagsString(json.tag_string_meta, Extension.tags_separator, "_", "meta"),
+                PoolTags: null,
             },
             Information: {
                 UploaderID: json.uploader_id,

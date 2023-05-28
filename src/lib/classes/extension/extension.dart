@@ -5,7 +5,7 @@ import 'package:ibuki/classes/extension/types.dart';
 
 class Extension extends ExtensionObject {
     int id = Random().nextInt(999999) + 100000;
-    String? name, kind, apiType, baseUrl, tagsSeparator, icon;
+    String? name, kind, apiType, baseUrl, tagsSeparator, version, icon;
     int? rateLimit;
     bool? networkAccess;
 
@@ -18,6 +18,7 @@ class Extension extends ExtensionObject {
         this.tagsSeparator,
         this.rateLimit,
         this.networkAccess,
+        this.version,
         this.icon
     }); 
 
@@ -40,6 +41,7 @@ class Extension extends ExtensionObject {
             tagsSeparator: object["tags_separator"],
             rateLimit: object["rate_limit"],
             networkAccess: object["network_access"],
+            version: object["version"],
             icon: object["icon"]
         );
     }
@@ -67,6 +69,7 @@ class Extension extends ExtensionObject {
         tagsSeparator = map["tags_separator"];
         rateLimit = map["rate_limit"];
         networkAccess = map["network_access"];
+        version = map["version"];
         icon = map["icon"];
     }
 
