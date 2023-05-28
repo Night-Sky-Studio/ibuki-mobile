@@ -38,7 +38,7 @@ abstract class ExtensionObject {
 }
 
 enum TagType {
-    general, artist, copyright, character, meta, lore, species, pool, unknown,
+    general, artist, copyright, character, meta, lore, species, invalid,
 }
 
 class Tag extends ExtensionObject {
@@ -82,7 +82,6 @@ class Tags {
     List<Tag>? loreTags;
     List<Tag>? generalTags;
     List<Tag>? metaTags;
-    List<Tag>? poolTags;
     List<Tag>? invalidTags;
 
     Tags({
@@ -93,12 +92,11 @@ class Tags {
         this.loreTags,
         this.generalTags,
         this.metaTags,
-        this.poolTags,
         this.invalidTags
     });
 
     @override
-    String toString() => "Tags(copyrightTags: $copyrightTags, characterTags: $characterTags, speciesTags: $speciesTags, artistTags: $artistTags, loreTags: $loreTags, generalTags: $generalTags, metaTags: $metaTags, poolTags: $poolTags, invalidTags: $invalidTags)";
+    String toString() => "Tags(copyrightTags: $copyrightTags, characterTags: $characterTags, speciesTags: $speciesTags, artistTags: $artistTags, loreTags: $loreTags, generalTags: $generalTags, metaTags: $metaTags, invalidTags: $invalidTags)";
 }
 
 class Score {

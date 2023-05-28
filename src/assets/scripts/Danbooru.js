@@ -49,7 +49,6 @@ function ParsePostJSON(json) {
                 LoreTags: null,
                 GeneralTags: MakeTagsFromTagsString(json.tag_string_general, Extension.tags_separator, "_", "general"),
                 MetaTags: MakeTagsFromTagsString(json.tag_string_meta, Extension.tags_separator, "_", "meta"),
-                PoolTags: null,
             },
             Information: {
                 UploaderID: json.uploader_id,

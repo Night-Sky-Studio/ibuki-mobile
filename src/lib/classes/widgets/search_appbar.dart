@@ -70,6 +70,7 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
                 }
                 return [];
             },
+            autofocus: true,
             initialValue: searchQuery.value,
             onChanged: (value) => searchQuery.value = value,
             onEditingComplete: () => searchFinished(context),

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:ibuki/classes/extension/booru_post.dart';
+import 'package:ibuki/classes/extension/types.dart';
 import 'package:media_store_plus/media_store_plus.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:path_provider/path_provider.dart';
@@ -69,7 +70,7 @@ class ImageViewerPage extends HookWidget {
                                         String savePath = "${dir.path}/Ibuki/$currentBooru/${image.id}.${image.postInformation.fileExtension}";
 
                                         try {
-                                            await Dio(BaseOptions(headers: {"User-Agent": "Aster/1.0.0 Ibuki/1.0.0"})).download(
+                                            await Dio(BaseOptions(headers: {"User-Agent": "IbukiMobile/1.0.0 Ibuki/1.0.0 (Night Sky Studio)"})).download(
                                                 image.originalFileURL, 
                                                 savePath,
                                                 onReceiveProgress: (received, total) {
@@ -108,14 +109,14 @@ class ImageViewerPage extends HookWidget {
                         ),
                         Expanded(child: Container(color: Theme.of(context).colorScheme.background, child: TabBarView(controller: tabController, children: [
                             SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                if (image.postTags.artistTags != null && image.postTags.artistTags!.isNotEmpty) TagsList(title: "Artist", tags: image.postTags.artistTags!.map((e) => e.tagDisplay()).toList(), color: Colors.red[400],),
-                                if (image.postTags.characterTags != null && image.postTags.characterTags!.isNotEmpty) TagsList(title: "Character", tags: image.postTags.characterTags!.map((e) => e.tagDisplay()).toList(), color: Colors.green,),
-                                if (image.postTags.copyrightTags != null && image.postTags.copyrightTags!.isNotEmpty) TagsList(title: "Copyright", tags: image.postTags.copyrightTags!.map((e) => e.tagDisplay()).toList(), color: Colors.purple[400],),
-                                if (image.postTags.generalTags != null && image.postTags.generalTags!.isNotEmpty) TagsList(title: "General", tags: image.postTags.generalTags!.map((e) => e.tagDisplay()).toList(), color: Colors.blue,),
-                                if (image.postTags.metaTags != null && image.postTags.metaTags!.isNotEmpty) TagsList(title: "Meta", tags: image.postTags.metaTags!.map((e) => e.tagDisplay()).toList(), color: Colors.orange[400],),
-                                if (image.postTags.speciesTags != null && image.postTags.speciesTags!.isNotEmpty) TagsList(title: "Species", tags: image.postTags.speciesTags!.map((e) => e.tagDisplay()).toList(), color: Colors.indigo[400],),
-                                if (image.postTags.invalidTags != null && image.postTags.invalidTags!.isNotEmpty) TagsList(title: "Invalid", tags: image.postTags.invalidTags!.map((e) => e.tagDisplay()).toList(), color: Colors.grey[400],),
-                            ],)),
+                                TagsList(title: "Artists", tags: image.postTags.artistTags),
+                                TagsList(title: "Copyrights", tags: image.postTags.copyrightTags),
+                                TagsList(title: "Species", tags: image.postTags.speciesTags),
+                                TagsList(title: "Characters", tags: image.postTags.characterTags),
+                                TagsList(title: "General", tags: image.postTags.generalTags),
+                                TagsList(title: "Meta", tags: image.postTags.metaTags),
+                                TagsList(title: "Invalid", tags: image.postTags.invalidTags)
+                            ])),
                             SingleChildScrollView(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Text("ID", style: Theme.of(context).textTheme.headlineSmall),
                                 Text("${image.id}"),

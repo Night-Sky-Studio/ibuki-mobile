@@ -65,8 +65,7 @@ class BooruPost extends Comparable {
             loreTags: processTags(map["Tags"]["LoreTags"], TagType.lore),
             generalTags: processTags(map["Tags"]["GeneralTags"], TagType.general),
             metaTags: processTags(map["Tags"]["MetaTags"], TagType.meta),
-            poolTags: processTags(map["Tags"]["PoolTags"], TagType.pool),
-            invalidTags: processTags(map["Tags"]["InvalidTags"], TagType.unknown),
+            invalidTags: processTags(map["Tags"]["InvalidTags"], TagType.invalid),
         );
         postInformation = Information(
             uploaderId: map["Information"]["UploaderID"],
