@@ -41,7 +41,7 @@ enum TagType {
     general, artist, copyright, character, meta, lore, species, invalid,
 }
 
-class Tag extends ExtensionObject {
+class Tag extends ExtensionObject implements Comparable<Tag> {
     String tagName;
     String? tagDisplayOverride;
     TagType type;
@@ -70,8 +70,21 @@ class Tag extends ExtensionObject {
         );
     }
 
+    negate() {
+        if (tagName.startsWith("-")) {
+            tagName = tagName.substring(1);
+        } else {
+            tagName = "-$tagName";
+        }
+    }
+
     @override
     String toString() => tagName;
+    
+    @override
+    int compareTo(Tag other) {
+        return tagName.compareTo(other.tagName) & type.index.compareTo(other.type.index);
+    }
 }
 
 class Tags {

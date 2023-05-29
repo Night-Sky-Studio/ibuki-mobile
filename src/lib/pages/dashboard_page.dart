@@ -5,15 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:ibuki/classes/extension/booru.dart';
 import 'package:ibuki/classes/extension/booru_post.dart';
+import 'package:ibuki/classes/extension/types.dart';
 import 'package:ibuki/classes/settings.dart';
 import 'package:ibuki/pages/image_viewer_page.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:window_manager/window_manager.dart';
 
 class DashboardPage extends HookWidget with WindowListener {
-    DashboardPage({super.key, required this.activeBooru, this.search = ""});
-    final Booru activeBooru;
+    DashboardPage({super.key, required this.settings, this.search = "", this.onSearchChanged});
+    final Settings settings;
     final String search;
+    final Function(List<Tag>)? onSearchChanged;
 
     int _calcColumnsCount(double width, {double colWidth = 160}) {
         return width ~/ colWidth;
@@ -32,11 +34,12 @@ class DashboardPage extends HookWidget with WindowListener {
     Widget build(BuildContext context) {        
         List<BooruPost> posts = [];
         final streamController = useStreamController();
+        final isMounted = useIsMounted();
 
         windowManager.addListener(this);
 
         Future<void> fetchPage(int page) async {
-            final items = await activeBooru.getPosts(page: page, search: search);
+            final items = await settings.activeBooru.getPosts(page: page, search: search);
             posts.addAll(items);
             streamController.sink.add(posts);
         }
@@ -82,13 +85,20 @@ class DashboardPage extends HookWidget with WindowListener {
                                             elevation: 2,
                                             child: InkWell(
                                                 borderRadius: BorderRadius.circular(4),
-                                                onTap: () {
+                                                onTap: () async {
                                                     debugPrint("Tapped image $index");
-                                                    Navigator.push(context, 
+                                                    
+                                                    final Tag? result = await Navigator.push(context, 
                                                         MaterialPageRoute(
-                                                            builder: (context) => ImageViewerPage(currentBooru: activeBooru.name!, image: posts[index], placeholder: NetworkImage(posts[index].previewFileUrl))
+                                                            builder: (context) => ImageViewerPage(settings: settings, image: posts[index], placeholder: NetworkImage(posts[index].previewFileUrl))
                                                         )
                                                     );
+
+                                                    if (!isMounted()) return;
+
+                                                    if (result != null) {
+                                                        onSearchChanged?.call([result]);
+                                                    }
                                                 },
                                                 child: Container(
                                                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),

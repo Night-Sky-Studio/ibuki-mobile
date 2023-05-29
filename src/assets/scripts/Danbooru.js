@@ -102,6 +102,11 @@ function ParseTagJSON(json) {
     try {
         if (typeof(json) !== typeof(JSON)) json = JSON.parse(json) 
 
+        if (
+            json.post_count != undefined && json.post_count == 0 ||
+            json.is_deprecated != undefined && json.is_deprecated == true
+        ) return null
+
         return {
             Name: json.name,
             DisplayName: json.name.replace("_", " "),

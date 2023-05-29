@@ -116,18 +116,24 @@ class TagListTile extends ListTile {
 class TagChip extends StatelessWidget {
     final Tag tag;
     final TagTheme? theme;
+    final VoidCallback? onPressed;
+    final VoidCallback? onDeleted;
 
     const TagChip({
         Key? key,
         required this.tag,
+        this.onPressed,
+        this.onDeleted,
         this.theme,
     }) : super(key: key);
     
     _makeChip(Color color) {
-        return Chip(
+        return RawChip(
             label: Text(tag.tagDisplay()),
             backgroundColor: color,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            onPressed: onPressed,
+            onDeleted: onDeleted,
         );
     }
 
@@ -161,8 +167,9 @@ class TagChip extends StatelessWidget {
 class TagsList extends StatelessWidget {
     final String title;
     final List<Tag>? tags;
+    final void Function(Tag)? onTagPressed;
 
-    const TagsList({super.key, required this.title, required this.tags});
+    const TagsList({super.key, required this.title, required this.tags, this.onTagPressed});
 
     @override
     Widget build(BuildContext context) {
@@ -181,7 +188,7 @@ class TagsList extends StatelessWidget {
                         alignment: WrapAlignment.start, 
                         spacing: 8, 
                         runSpacing: 8, 
-                        children: tags?.map((tag) => TagChip(tag: tag)).toList() ?? []
+                        children: tags?.map((tag) => TagChip(tag: tag, onPressed: () => onTagPressed?.call(tag))).toList() ?? []
                     )
                 )
             ]

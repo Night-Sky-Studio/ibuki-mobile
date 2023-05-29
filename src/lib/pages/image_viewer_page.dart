@@ -9,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:ibuki/classes/extension/booru_post.dart';
 import 'package:ibuki/classes/extension/types.dart';
+import 'package:ibuki/classes/settings.dart';
+import 'package:ibuki/pages/main_page.dart';
 import 'package:media_store_plus/media_store_plus.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:path_provider/path_provider.dart';
@@ -33,20 +35,35 @@ class MaterialIconButton extends StatelessWidget {
 }
 
 class ImageViewerPage extends HookWidget {
-    final String currentBooru;
+    final Settings settings;
     final BooruPost image;
     final ImageProvider placeholder;
 
-    const ImageViewerPage({super.key, required this.currentBooru, required this.image, required this.placeholder});
+    ImageViewerPage({super.key, required this.settings, required this.image, required this.placeholder});
+
+    final panelController = PanelController();
 
     @override
     Widget build(BuildContext context) {
         final vsync = useSingleTickerProvider();
         final tabController = useTabController(initialLength: 3, vsync: vsync);
 
+        void onTagPressed(Tag tag) {
+            debugPrint("Tag: ${tag.tagName}");
+            
+            if (panelController.isAttached) panelController.close();
+
+            Navigator.push(context, 
+                MaterialPageRoute(
+                    builder: (context) => MainPage(settings: settings, searchRequest: tag)
+                )
+            );
+        }
+
         return Scaffold(
             appBar: AppBar(title: Text("ID: ${image.id}"), backgroundColor: Theme.of(context).colorScheme.primary,),
             body: SlidingUpPanel(
+                controller: panelController,
                 minHeight: 64,
                 maxHeight: MediaQuery.of(context).size.height * 0.8,
                 panel: Column(
@@ -67,7 +84,7 @@ class ImageViewerPage extends HookWidget {
                                     }
 
                                     if(dir != null) {
-                                        String savePath = "${dir.path}/Ibuki/$currentBooru/${image.id}.${image.postInformation.fileExtension}";
+                                        String savePath = "${dir.path}/Ibuki/${settings.activeBooru.name!}/${image.id}.${image.postInformation.fileExtension}";
 
                                         try {
                                             await Dio(BaseOptions(headers: {"User-Agent": "IbukiMobile/1.0.0 Ibuki/1.0.0 (Night Sky Studio)"})).download(
@@ -82,9 +99,9 @@ class ImageViewerPage extends HookWidget {
                                             );
 
                                             if (Platform.isAndroid) {
-                                                MediaStore.appFolder = "Ibuki/$currentBooru/";
+                                                MediaStore.appFolder = "Ibuki/${settings.activeBooru.name!}/";
                                                 var store = MediaStore();
-                                                bool result = await store.saveFile(tempFilePath: savePath, dirType: DirType.download, dirName: DirName.download, relativePath: "Ibuki/$currentBooru/");
+                                                bool result = await store.saveFile(tempFilePath: savePath, dirType: DirType.download, dirName: DirName.download, relativePath: "Ibuki/${settings.activeBooru.name!}/");
                                                 debugPrint("$result");
                                             }
 
@@ -109,13 +126,13 @@ class ImageViewerPage extends HookWidget {
                         ),
                         Expanded(child: Container(color: Theme.of(context).colorScheme.background, child: TabBarView(controller: tabController, children: [
                             SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                TagsList(title: "Artists", tags: image.postTags.artistTags),
-                                TagsList(title: "Copyrights", tags: image.postTags.copyrightTags),
-                                TagsList(title: "Species", tags: image.postTags.speciesTags),
-                                TagsList(title: "Characters", tags: image.postTags.characterTags),
-                                TagsList(title: "General", tags: image.postTags.generalTags),
-                                TagsList(title: "Meta", tags: image.postTags.metaTags),
-                                TagsList(title: "Invalid", tags: image.postTags.invalidTags)
+                                TagsList(title: "Artists", tags: image.postTags.artistTags, onTagPressed: onTagPressed),
+                                TagsList(title: "Copyrights", tags: image.postTags.copyrightTags, onTagPressed: onTagPressed),
+                                TagsList(title: "Species", tags: image.postTags.speciesTags, onTagPressed: onTagPressed),
+                                TagsList(title: "Characters", tags: image.postTags.characterTags, onTagPressed: onTagPressed),
+                                TagsList(title: "General", tags: image.postTags.generalTags, onTagPressed: onTagPressed),
+                                TagsList(title: "Meta", tags: image.postTags.metaTags, onTagPressed: onTagPressed),
+                                TagsList(title: "Invalid", tags: image.postTags.invalidTags, onTagPressed: onTagPressed)
                             ])),
                             SingleChildScrollView(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Text("ID", style: Theme.of(context).textTheme.headlineSmall),
