@@ -49,6 +49,7 @@ dependencies:
   window_manager: ^0.3.4
 #   flutter_acrylic: ^1.1.0
   visibility_detector: ^0.4.0+2
+  device_info_plus: ^8.2.2
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get_storage/get_storage.dart';
@@ -14,14 +15,17 @@ void main() async {
     await settings.init(null);
 
     if (Platform.isAndroid) {
-        Map<Permission, PermissionStatus> statuses = await [
-            Permission.storage,
-            //add more permission to request here.
-        ].request();
+        AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt < 33) {
+            Map<Permission, PermissionStatus> statuses = await [
+                Permission.storage,
+                //add more permission to request here.
+            ].request();
 
-        if (!statuses[Permission.storage]!.isGranted) {
-            debugPrint("Permission denied.");
-            exit(1);
+            if (!statuses[Permission.storage]!.isGranted) {
+                debugPrint("Permission denied.");
+                exit(1);
+            }
         }
     }
 
