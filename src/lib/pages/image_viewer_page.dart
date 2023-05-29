@@ -12,6 +12,8 @@ import 'package:ibuki/classes/extension/types.dart';
 import 'package:ibuki/classes/settings.dart';
 import 'package:ibuki/pages/main_page.dart';
 import 'package:media_store_plus/media_store_plus.dart';
+import 'package:pasteboard/pasteboard.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ibuki/classes/widgets/tag_widgets.dart';
@@ -42,6 +44,28 @@ class ImageViewerPage extends HookWidget {
     ImageViewerPage({super.key, required this.settings, required this.image, required this.placeholder});
 
     final panelController = PanelController();
+
+    Future<String?> downloadToTemp(BooruPost image) async {
+        Directory dir = await getTemporaryDirectory();
+
+        String savePath = "${dir.path}/Ibuki/Share/${image.id}.${image.postInformation.fileExtension}";
+
+        try {
+            await Dio(BaseOptions(headers: {"User-Agent": "IbukiMobile/1.0.0 Ibuki/1.0.0 (Night Sky Studio)"})).download(
+                image.largeFileUrl, 
+                savePath,
+                onReceiveProgress: (received, total) {
+                    if (total != -1) {
+                        debugPrint("${(received / total * 100).toStringAsFixed(0)}%");
+                    }
+                }
+            );
+
+            return savePath;
+        } on DioError catch (_) {
+            return null;
+        }
+    }
 
     @override
     Widget build(BuildContext context) {
@@ -113,7 +137,57 @@ class ImageViewerPage extends HookWidget {
                                     
                                     
                                 }),
-                                MaterialIconButton(icon: const Icon(Icons.share), onPressed: () { }),
+                                MaterialIconButton(icon: const Icon(Icons.share), onPressed: () async {
+                                    if (Platform.isWindows || Platform.isMacOS) {
+                                        final result = await showDialog<int>(context: context, builder: (context) {
+                                            return AlertDialog(
+                                                title: const Text("Share"),
+                                                actions: [
+                                                    ElevatedButton(onPressed: () => Navigator.pop(context, 1), child: const Text("Copy Image")),
+                                                    ElevatedButton(onPressed: () => Navigator.pop(context, 2), child: const Text("Copy Direct URL")),
+                                                    ElevatedButton(onPressed: () => Navigator.pop(context, 3), child: const Text("More")),
+                                                    TextButton(onPressed: () { Navigator.pop(context, 0); }, child: const Text("Cancel")),
+                                                ],
+                                                alignment: Alignment.center,   
+                                            );
+                                        });
+
+                                        switch(result) {
+                                            case 0:
+                                                break;
+                                            case 1:
+                                                final path = await downloadToTemp(image);
+                                                if (path != null) {
+                                                    await Pasteboard.writeFiles([path]);
+                                                }
+
+                                                break;
+                                            case 2:
+                                                Clipboard.setData(ClipboardData(text: image.directUrl));
+                                                break;
+                                            case 3:
+                                                final path = await downloadToTemp(image);
+                                                if (path != null) {
+                                                    await Share.shareXFiles([XFile(path)]);
+
+                                                    // TODO: Delete temp files on app close, not after share
+                                                    await File(path).delete();
+                                                    debugPrint("File removed.");  
+                                                }
+                                                break;
+                                        }
+                                    } else {
+                                        final path = await downloadToTemp(image);   
+                                        if (path != null) {
+                                            await Share.shareXFiles([XFile(path)]);
+
+                                            // TODO: Delete temp files on app close, not after share
+                                            await File(path).delete();
+                                            debugPrint("File removed.");  
+                                        }
+                                    }
+                                
+                                }),
                                 MaterialIconButton(icon: const Icon(Icons.favorite_border_outlined), onPressed: () { debugPrint("favorite"); }),
                             ]),
                         ),
