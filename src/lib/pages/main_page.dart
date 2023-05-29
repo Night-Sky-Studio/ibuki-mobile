@@ -15,7 +15,8 @@ import 'package:ibuki/pages/dashboard_page.dart';
 import 'package:ibuki/pages/settings_page.dart';
 
 class MainPage extends HookWidget {
-    MainPage({super.key, required this.settings});
+    const MainPage({super.key, required this.settings, this.searchRequest});
+    final Tag? searchRequest;
     final Settings settings;
 
     Widget _processIcon(String? icon) {
@@ -23,10 +24,6 @@ class MainPage extends HookWidget {
         if (icon.startsWith("http")) return Image(image: NetworkImage(icon));
         return Image.memory(const Base64Decoder().convert(icon));
     }
-
-
-
-    
 
     @override
     Widget build(BuildContext context) {
@@ -36,11 +33,27 @@ class MainPage extends HookWidget {
 
         final title = useState(settings.activeBooru.name ?? "Ibuki");
         final search = useState("");
+        final searchOverride = useState<Tag?>(null);
+
+        final requestFulfilled = useState(false);
 
         final debugString = useState("");
 
+        if (searchRequest != null && !requestFulfilled.value) {
+            search.value = searchRequest!.tagName;
+            title.value = searchRequest!.tagName;
+            searchOverride.value = searchRequest!;
+            requestFulfilled.value = true;
+        }
+ 
         final List<Widget> pages = <Widget>[
-            DashboardPage(activeBooru: settings.boorus[activeBooru.value], search: search.value),
+            DashboardPage(settings: settings, search: search.value, 
+                // onSearchChanged: (tags) {
+                //     searchOverride.value = tags;
+                //     search.value = Tag.tagListToString(tags);
+                //     title.value = Tag.tagListToString(tags);
+                // }
+            ),
             // TODO: Following page
             // TODO: Add ability to follow certain tags
             // TODO: OR every followed tag's result images
@@ -48,7 +61,7 @@ class MainPage extends HookWidget {
             //? Question tho, should it be bound to a single booru,
             //? or should it be able to track what tags were followed and
             //? then just combine everything?
-            DashboardPage(activeBooru: settings.boorus[activeBooru.value], search: "rating:g"),
+            DashboardPage(settings: settings, search: "rating:g"),
             SettingsPage(settings: settings)
         ];
 
@@ -56,7 +69,16 @@ class MainPage extends HookWidget {
 
         return Scaffold(
             appBar: SearchAppBar(
+                leading: //Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: [
+                    //if (searchRequest != null) 
+                       searchRequest != null ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.of(context).pop()) : null,
+                    // IconButton(
+                    //     icon: const Icon(Icons.menu),
+                    //     onPressed: () => Scaffold.of(context).openDrawer(),
+                    // )
+                //],),
                 title: title.value, 
+                initialValue: searchOverride.value,
                 settings: settings, 
                 onSearch: (context, tags) {
                     search.value = Tag.tagListToString(tags);
@@ -65,6 +87,7 @@ class MainPage extends HookWidget {
                 onSearchClear: (context) {
                     search.value = "";
                     title.value = settings.activeBooru.name ?? "Ibuki";
+                    searchOverride.value = null;
                 }
             ),
             body: Center(

@@ -1,6 +1,7 @@
 import 'package:chips_input/chips_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:ibuki/classes/extension/types.dart';
 import 'package:ibuki/classes/settings.dart';
 import 'package:ibuki/classes/widgets/tag_widgets.dart';
@@ -20,12 +21,16 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
         required this.settings, 
         required this.onSearch, 
         required this.onSearchClear,
+        this.leading,
         this.title, 
+        this.initialValue,
         this.toolbarHeight, 
         this.bottom, 
     });
     
+    final Widget? leading;
     final String? title;
+    final Tag? initialValue;
     final Settings settings;
     final double? toolbarHeight;
     final PreferredSizeWidget? bottom;
@@ -39,6 +44,10 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
         final search = useState("");
         final searchQuery = useState<List<Tag>>([]);
 
+        if (initialValue != null && searchQuery.value.isEmpty) {
+            // search.value = initialValue!.tagName;
+            searchQuery.value = [initialValue!];
+        }
 
         Future<List<Tag>?> searchTag(String query) async {
             final booru = settings.activeBooru;
@@ -57,7 +66,11 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
         final chipInput = ChipsInput<Tag>(
             chipBuilder: (context, state, tag) => TagChip(
                 key: ObjectKey(tag),
-                tag: tag
+                tag: tag,
+                onPressed: () {
+                    // tag.negate();
+                },
+                onDeleted: () => state.deleteChip(tag),
             ), 
             suggestionBuilder: (context, tag) => TagListTile(
                 key: ObjectKey(tag),
@@ -77,6 +90,7 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
         );
 
         return AppBar(
+            leading: leading,
             title: searchActive.value ? chipInput : Text(search.value.isNotEmpty ? search.value : title ??  ""),
             actions: [
                 IconButton(
@@ -84,7 +98,7 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
                     icon: const Icon(Icons.search)
                 ),
                 Visibility(
-                    visible: search.value.isNotEmpty || searchActive.value,
+                    visible: searchQuery.value.isNotEmpty || search.value.isNotEmpty || searchActive.value,
                     child: IconButton(
                         onPressed: () {
                             searchActive.value = false;
