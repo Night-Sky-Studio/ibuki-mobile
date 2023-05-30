@@ -41,5 +41,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with: 
           name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: src/build/app/outputs/flutter-apk/app-release.apk
 #       - run: flutter build appbundle
