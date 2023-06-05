@@ -9,10 +9,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:ibuki/classes/extension/booru_post.dart';
 import 'package:ibuki/classes/extension/types.dart';
+// import 'package:ibuki/classes/hooks/panel_controller_hook.dart';
 import 'package:ibuki/classes/settings.dart';
 import 'package:ibuki/pages/main_page.dart';
 import 'package:media_store_plus/media_store_plus.dart';
 import 'package:pasteboard/pasteboard.dart';
+// import 'package:preload_page_view/preload_page_view.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:path_provider/path_provider.dart';
@@ -38,14 +40,24 @@ class MaterialIconButton extends StatelessWidget {
 
 class ImageViewerPage extends HookWidget {
     final Settings settings;
-    final BooruPost image;
-    final ImageProvider placeholder;
+    // final BooruPost image;
+    final List<BooruPost> images;
+    final int currentIndex;
+    // final ImageProvider placeholder;
 
-    ImageViewerPage({super.key, required this.settings, required this.image, required this.placeholder});
+    /// Called to ask for more images from Dashboard page
+    final VoidCallback? onEndReached;
 
+    ImageViewerPage({super.key, required this.settings, required this.images, required this.currentIndex, this.onEndReached});
+
+    // TODO: Make into a hook
     final panelController = PanelController();
 
-    Future<String?> downloadToTemp(BooruPost image) async {
+    SnackBar makeSnackbar(String text) {
+        return SnackBar(content: Text(text), behavior: SnackBarBehavior.floating, margin: const EdgeInsets.all(72));
+    }
+
+    Future<String?> downloadToTemp(BooruPost image, {BuildContext? context}) async {
         Directory dir = await getTemporaryDirectory();
 
         String savePath = "${dir.path}/Ibuki/Share/${image.id}.${image.postInformation.fileExtension}";
@@ -71,6 +83,9 @@ class ImageViewerPage extends HookWidget {
     Widget build(BuildContext context) {
         final vsync = useSingleTickerProvider();
         final tabController = useTabController(initialLength: 3, vsync: vsync);
+        final pageController = usePageController(initialPage: currentIndex);
+
+        //BooruPost image() => images[pageController.page!.truncate()];
 
         void onTagPressed(Tag tag) {
             debugPrint("Tag: ${tag.tagName}");
@@ -84,7 +99,7 @@ class ImageViewerPage extends HookWidget {
             );
         }
 
-        return Scaffold(
+        Scaffold buildScaffold(BooruPost image) => Scaffold(
             appBar: AppBar(title: Text("ID: ${image.id}"), backgroundColor: Theme.of(context).colorScheme.primary,),
             body: SlidingUpPanel(
                 controller: panelController,
@@ -266,7 +281,7 @@ class ImageViewerPage extends HookWidget {
                                         fit: StackFit.expand,
                                         alignment: Alignment.center,
                                         children: [
-                                            Image(image: placeholder, fit: BoxFit.contain),
+                                            CachedNetworkImage(imageUrl: image.previewFileUrl, fit: BoxFit.contain),
                                             BackdropFilter(filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
                                                 child: Center(child: CircularProgressIndicator(value: downloadProgress.progress))
                                             ),
@@ -280,6 +295,18 @@ class ImageViewerPage extends HookWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(16)),
                 parallaxEnabled: true,
             )
+        );
+
+        return PageView.builder(
+            controller: pageController,
+            itemCount: images.length,
+            // preloadPagesCount: 2,
+            onPageChanged: (value) {
+                if (value == images.length) onEndReached?.call();
+            },
+            itemBuilder: (context, index) {
+                return buildScaffold(images[index]);
+            },
         );
     }
 }

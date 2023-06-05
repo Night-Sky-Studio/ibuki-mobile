@@ -90,7 +90,15 @@ class DashboardPage extends HookWidget with WindowListener {
                                                     
                                                     final Tag? result = await Navigator.push(context, 
                                                         MaterialPageRoute(
-                                                            builder: (context) => ImageViewerPage(settings: settings, image: posts[index], placeholder: NetworkImage(posts[index].previewFileUrl))
+                                                            builder: (context) => ImageViewerPage(
+                                                                settings: settings, 
+                                                                images: posts, 
+                                                                currentIndex: index, 
+                                                                // placeholder: NetworkImage(posts[index].previewFileUrl),
+                                                                onEndReached: () async {
+                                                                    await fetchPage(++page);
+                                                                },
+                                                            )
                                                         )
                                                     );
 
