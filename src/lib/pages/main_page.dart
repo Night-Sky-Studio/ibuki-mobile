@@ -12,7 +12,7 @@ import 'package:ibuki/classes/settings.dart';
 import 'package:ibuki/classes/widgets/search_appbar.dart';
 import 'package:ibuki/classes/widgets/tag_widgets.dart';
 import 'package:ibuki/pages/dashboard_page.dart';
-import 'package:ibuki/pages/settings_page.dart';
+import 'package:ibuki/pages/more_page.dart';
 
 class MainPage extends HookWidget {
     const MainPage({super.key, required this.settings, this.searchRequest});
@@ -36,6 +36,8 @@ class MainPage extends HookWidget {
         final searchOverride = useState<Tag?>(null);
 
         final requestFulfilled = useState(false);
+
+        final appBarVisible = useState(true);
 
         final debugString = useState("");
 
@@ -62,13 +64,14 @@ class MainPage extends HookWidget {
             //? or should it be able to track what tags were followed and
             //? then just combine everything?
             DashboardPage(settings: settings, search: "rating:g"),
-            SettingsPage(settings: settings)
+            MorePage(settings: settings)
         ];
 
         // const knownBoorus 
 
         return Scaffold(
             appBar: SearchAppBar(
+                visible: appBarVisible.value,
                 leading: //Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: [
                     //if (searchRequest != null) 
                        searchRequest != null ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.of(context).pop()) : null,
@@ -97,7 +100,7 @@ class MainPage extends HookWidget {
                 items: const <BottomNavigationBarItem>[
                     BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Dashboard"),
                     BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Followed"),
-                    BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+                    BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: "More"),
                 ],
                 showUnselectedLabels: false,
                 currentIndex: selectedIndex.value,
@@ -105,9 +108,11 @@ class MainPage extends HookWidget {
                 onTap: (int index) {
                     selectedIndex.value = index;
                     if (index == 2) {
-                        title.value = "Settings";
+                        title.value = "Ibuki";
+                        appBarVisible.value = false;
                     } else {
                         title.value = settings.activeBooru.name ?? "Ibuki";
+                        appBarVisible.value = true;
                     }
                 },
             ),
