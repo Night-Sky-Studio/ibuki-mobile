@@ -50,7 +50,6 @@ class ImageViewerPage extends HookWidget {
 
     ImageViewerPage({super.key, required this.settings, required this.images, required this.currentIndex, this.onEndReached});
 
-    // TODO: Make into a hook
     final panelController = PanelController();
 
     SnackBar makeSnackbar(String text) {
@@ -84,6 +83,21 @@ class ImageViewerPage extends HookWidget {
         final vsync = useSingleTickerProvider();
         final tabController = useTabController(initialLength: 3, vsync: vsync);
         final pageController = usePageController(initialPage: currentIndex);
+        final panelScrollController = useScrollController();
+        panelScrollController.addListener(() {
+            debugPrint("Panel scroll: ${panelScrollController.offset}");
+
+            // When user will try to scroll back to the top, we will start closing panel
+            // This should be fired only when our panel's scroll view can be scrolled (maxScrollExtent > panelHeight)
+            // 
+
+            // if (panelController.isAttached && 
+            //     panelScrollController.offset <= 0 && 
+            //     panelScrollController.position.maxScrollExtent > MediaQuery.of(context).size.height * 0.8) {
+                
+            //     panelController.close();
+            // }
+        });
 
         //BooruPost image() => images[pageController.page!.truncate()];
 
@@ -100,7 +114,7 @@ class ImageViewerPage extends HookWidget {
         }
 
         Scaffold buildScaffold(BooruPost image) => Scaffold(
-            appBar: AppBar(title: Text("ID: ${image.id}"), backgroundColor: Theme.of(context).colorScheme.primary,),
+            appBar: AppBar(title: Text("ID: ${image.id}"), backgroundColor: Theme.of(context).colorScheme.primary),
             body: SlidingUpPanel(
                 controller: panelController,
                 minHeight: 64,
@@ -297,16 +311,32 @@ class ImageViewerPage extends HookWidget {
             )
         );
 
-        return PageView.builder(
-            controller: pageController,
-            itemCount: images.length,
-            // preloadPagesCount: 2,
-            onPageChanged: (value) {
-                if (value == images.length) onEndReached?.call();
+        return RawKeyboardListener(
+            focusNode: FocusNode(),
+            onKey: (value) {
+                if (value.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
+                    if (pageController.page! > 0) {
+                        pageController.previousPage(duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
+                    }
+                } else if (value.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
+                    if (pageController.page! < images.length) {
+                        pageController.nextPage(duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
+                    }
+                }
             },
-            itemBuilder: (context, index) {
-                return buildScaffold(images[index]);
-            },
+            child: PageView.builder(
+                controller: pageController,
+                allowImplicitScrolling: false,
+                itemCount: images.length,
+                scrollDirection: Axis.horizontal,
+                // preloadPagesCount: 2,
+                onPageChanged: (value) {
+                    if (value == images.length) onEndReached?.call();
+                },
+                itemBuilder: (context, index) {
+                    return buildScaffold(images[index]);
+                },
+            ),
         );
     }
 }
