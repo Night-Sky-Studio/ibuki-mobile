@@ -92,7 +92,7 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
             onEditingComplete: () => searchFinished(context),
         );
 
-        visible ?? false ? animationController.reverse() : animationController.forward();
+        visible ?? true ? animationController.reverse() : animationController.forward();
 
         return SlideTransition(
             position: Tween<Offset>(
