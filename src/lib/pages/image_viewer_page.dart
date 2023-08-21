@@ -11,6 +11,7 @@ import 'package:ibuki/classes/extension/booru_post.dart';
 import 'package:ibuki/classes/extension/types.dart';
 // import 'package:ibuki/classes/hooks/panel_controller_hook.dart';
 import 'package:ibuki/classes/settings.dart';
+import 'package:ibuki/classes/widgets/material_icon_button.dart';
 import 'package:ibuki/pages/main_page.dart';
 import 'package:media_store_plus/media_store_plus.dart';
 import 'package:pasteboard/pasteboard.dart';
@@ -19,24 +20,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ibuki/classes/widgets/tag_widgets.dart';
-
-class MaterialIconButton extends StatelessWidget {
-    final Icon icon;
-    final VoidCallback onPressed;
-    final Color? color;
-    
-    const MaterialIconButton({super.key, required this.icon, required this.onPressed, this.color});
-
-    @override
-    Widget build(BuildContext context) {
-        return Material(color: Colors.transparent, shape: const CircleBorder(),
-            child: InkWell(customBorder: const CircleBorder(),
-                onTap: onPressed,
-                child: Padding(padding: const EdgeInsets.all(16), child: icon),
-            ),
-        );
-    }
-}
 
 class ImageViewerPage extends HookWidget {
     final Settings settings;
@@ -99,6 +82,19 @@ class ImageViewerPage extends HookWidget {
             // }
         });
 
+        
+        final downloadProgress = useState<double?>(null);
+
+        /// This sadly does not work and it's not even my fault
+        /// Looks like flutter can't update widgets of this kind of construction,
+        /// since it does not seem like Dart supports references at all.
+        
+        // final downloadIcons = <Widget>[
+        //     const Icon(Icons.download),
+        //     CircularProgressIndicator(value: (downloadProgress.value ?? -1) == -1 ? null : downloadProgress.value, valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).textTheme.bodyMedium!.color!)),
+        //     const Icon(Icons.check)
+        // ];
+        // final downloadIcon = useState<Widget>(downloadIcons[0]);
         //BooruPost image() => images[pageController.page!.truncate()];
 
         void onTagPressed(Tag tag) {
@@ -128,44 +124,50 @@ class ImageViewerPage extends HookWidget {
                                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                             ),
                             child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                                MaterialIconButton(icon: const Icon(Icons.download), onPressed: () async { 
-                                    Directory? dir;
-                                    if (Platform.isAndroid) {
-                                        dir = await getTemporaryDirectory();//Directory("/storage/emulated/0/Download");//await getExternalStorageDirectory();
-                                    } else {
-                                        dir = await getDownloadsDirectory();
-                                    }
+                                MaterialIconButton(
+                                    icon: downloadProgress.value == null 
+                                        ? const Icon(Icons.download) 
+                                        : downloadProgress.value == 1
+                                            ? const Icon(Icons.check)
+                                            : CircularProgressIndicator(value: (downloadProgress.value ?? -1) == -1 ? null : downloadProgress.value, valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).textTheme.bodyMedium!.color!)), 
+                                    onPressed: () async { 
+                                        downloadProgress.value = -1;
+                                        Directory? dir;
+                                        if (Platform.isAndroid) {
+                                            dir = await getTemporaryDirectory();//Directory("/storage/emulated/0/Download");//await getExternalStorageDirectory();
+                                        } else {
+                                            dir = await getDownloadsDirectory();
+                                        }
 
-                                    if(dir != null) {
-                                        String savePath = "${dir.path}/Ibuki/${settings.activeBooru.name!}/${image.id}.${image.postInformation.fileExtension}";
+                                        if(dir != null) {
+                                            String savePath = "${dir.path}/Ibuki/${settings.activeBooru.name!}/${image.id}.${image.postInformation.fileExtension}";
 
-                                        try {
-                                            await Dio(BaseOptions(headers: {"User-Agent": "IbukiMobile/1.0.0 Ibuki/1.0.0 (Night Sky Studio)"})).download(
-                                                image.originalFileURL, 
-                                                savePath,
-                                                onReceiveProgress: (received, total) {
-                                                    if (total != -1) {
-                                                        debugPrint("${(received / total * 100).toStringAsFixed(0)}%");
-                                                        //you can build progressbar feature too
+                                            try {
+                                                await Dio(BaseOptions(headers: {"User-Agent": "IbukiMobile/1.0.0 Ibuki/1.0.0 (Night Sky Studio)"})).download(
+                                                    image.originalFileURL, 
+                                                    savePath,
+                                                    onReceiveProgress: (received, total) {
+                                                        if (total != -1) {
+                                                            // debugPrint("${(received / total * 100).toStringAsFixed(0)}%");
+                                                            downloadProgress.value = received / total;
+                                                        }
                                                     }
+                                                );
+
+                                                if (Platform.isAndroid) {
+                                                    MediaStore.appFolder = "Ibuki/${settings.activeBooru.name!}/";
+                                                    var store = MediaStore();
+                                                    bool result = await store.saveFile(tempFilePath: savePath, dirType: DirType.download, dirName: DirName.download, relativePath: "Ibuki/${settings.activeBooru.name!}/");
+                                                    debugPrint("$result");
                                                 }
-                                            );
 
-                                            if (Platform.isAndroid) {
-                                                MediaStore.appFolder = "Ibuki/${settings.activeBooru.name!}/";
-                                                var store = MediaStore();
-                                                bool result = await store.saveFile(tempFilePath: savePath, dirType: DirType.download, dirName: DirName.download, relativePath: "Ibuki/${settings.activeBooru.name!}/");
-                                                debugPrint("$result");
+                                                debugPrint("File is saved to download folder.");  
+                                            } on DioError catch (e) {
+                                                debugPrint(e.message);
                                             }
-
-                                            debugPrint("File is saved to download folder.");  
-                                        } on DioError catch (e) {
-                                            debugPrint(e.message);
                                         }
                                     }
-                                    
-                                    
-                                }),
+                                ),
                                 MaterialIconButton(icon: const Icon(Icons.share), onPressed: () async {
                                     if (Platform.isWindows || Platform.isMacOS) {
                                         final result = await showDialog<int>(context: context, builder: (context) {
@@ -332,6 +334,7 @@ class ImageViewerPage extends HookWidget {
                 // preloadPagesCount: 2,
                 onPageChanged: (value) {
                     if (value == images.length) onEndReached?.call();
+                    downloadProgress.value = null;
                 },
                 itemBuilder: (context, index) {
                     return buildScaffold(images[index]);
