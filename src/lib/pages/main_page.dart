@@ -19,17 +19,11 @@ class MainPage extends HookWidget {
     final Tag? searchRequest;
     final Settings settings;
 
-    Widget _processIcon(String? icon) {
-        if (icon == null || icon == "") return const Icon(Icons.broken_image);
-        if (icon.startsWith("http")) return Image(image: NetworkImage(icon));
-        return Image.memory(const Base64Decoder().convert(icon));
-    }
-
     @override
     Widget build(BuildContext context) {
         final selectedIndex = useState(0);
         // find index of active booru using id from settings and list of loaded boorus
-        final activeBooru = useState(settings.boorus.indexWhere((element) => element.id == settings.activeBooruId));
+        final activeBooru = useState(settings.activeBooruIdx);
 
         final title = useState(settings.activeBooru.name ?? "Ibuki");
         final search = useState("");
@@ -136,12 +130,13 @@ class MainPage extends HookWidget {
                             default:
                                 return ListTile(
                                     title: Text(settings.boorus[index - 1].name!),
-                                    leading: (_processIcon(settings.boorus[index - 1].icon)),
+                                    leading: (processIcon(settings.boorus[index - 1].icon)),
                                     tileColor: activeBooru.value == index - 1 ? Theme.of(context).colorScheme.primary.withAlpha(150) : null,
-                                    onTap: () {
+                                    onTap: () async {
                                         activeBooru.value = index - 1;
-                                        settings.activeBooruId = settings.boorus[index - 1].id;
+                                        settings.activeBooruIdx = index - 1;
                                         title.value = settings.boorus[index - 1].name.toString();
+                                        await settings.save();
                                     },
                                 );
                         }
