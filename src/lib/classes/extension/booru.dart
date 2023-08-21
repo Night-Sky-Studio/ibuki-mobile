@@ -97,6 +97,7 @@ function fetch(url, options) {
     Future<JsEvalResult> runtimeEvalAsync(String code) async {       
         _runtime.enableHandlePromises(); 
 
+        await Future.delayed(Duration(milliseconds: rateLimit ?? 10));
         var asyncResult = await _runtime.evaluateAsync(code);
         _runtime.executePendingJob();
         
@@ -156,7 +157,7 @@ function fetch(url, options) {
             json = json.substring(0, json.length - 1).substring(1).replaceAll("\\\"", "\"");
         }
 
-        await Future.delayed(Duration(milliseconds: rateLimit ?? 10));
+        
 
         List<dynamic> decoded = jsonDecode(json);
         return decoded.map((e) => BooruPost.map(e)).toList();
