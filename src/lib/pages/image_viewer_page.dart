@@ -84,6 +84,7 @@ class ImageViewerPage extends HookWidget {
 
         
         final downloadProgress = useState<double?>(null);
+        final isMounted = useIsMounted();
 
         /// This sadly does not work and it's not even my fault
         /// Looks like flutter can't update widgets of this kind of construction,
@@ -149,7 +150,11 @@ class ImageViewerPage extends HookWidget {
                                                     onReceiveProgress: (received, total) {
                                                         if (total != -1) {
                                                             // debugPrint("${(received / total * 100).toStringAsFixed(0)}%");
-                                                            downloadProgress.value = received / total;
+                                                            if(isMounted()) {
+                                                                downloadProgress.value = received / total;
+                                                            } else {
+                                                                debugPrint("Unmounted. Progress: ${(received / total) * 100}%");
+                                                            }
                                                         }
                                                     }
                                                 );
