@@ -51,6 +51,8 @@ dependencies:
   visibility_detector: ^0.4.0+2
   device_info_plus: ^8.2.2
   pasteboard: ^0.2.0
+  http: ^0.13.6
+  grouped_list: ^5.1.2
 
 dev_dependencies:
   flutter_test:
