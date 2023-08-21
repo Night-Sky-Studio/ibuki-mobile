@@ -2,20 +2,90 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_js/extensions/fetch.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_js/flutter_js.dart';
 import 'package:ibuki/classes/extension/booru_post.dart';
 import 'package:ibuki/classes/extension/extension.dart';
 import 'package:ibuki/classes/extension/types.dart';
 
 class Booru extends Extension {
-    final JavascriptRuntime _runtime = getJavascriptRuntime();
+    final JavascriptRuntime _runtime = getJavascriptRuntime(xhr: false);
 
-    static const _internalJsCode = """const UserAgent="IbukiMobile/1.0.0 Ibuki/1.0.0 (Night Sky Studio)";function url(t){let e="";if(t.base&&(e+=t.base,t.base.endsWith("/")||(e+="/")),t.path&&(t.path.startsWith("/")?e+=t.path.substring(1):e+=t.path,t.path.endsWith("/")&&(e=e.substring(0,e.length-1))),t.query){for(let s of(e+="?",t.query)){let n=Object.entries(s)[0];""!==n[1]&&(e+=n[0]+"="+n[1]+"&")}e=e.substring(0,e.length-1)}return e}""";
+    static const _internalJsCode = """const UserAgent = "IbukiMobile/1.0.0 Ibuki/1.0.0 (Night Sky Studio)"
+function url(t) {
+    let e = ""
+    if ((t.base && ((e += t.base), t.base.endsWith("/") || (e += "/")), t.path && (t.path.startsWith("/") ? (e += t.path.substring(1)) : (e += t.path), t.path.endsWith("/") && (e = e.substring(0, e.length - 1))), t.query)) {
+        for (let s of ((e += "?"), t.query)) {
+            let n = Object.entries(s)[0];
+            "" !== n[1] && (e += n[0] + "=" + n[1] + "&");
+        }
+        e = e.substring(0, e.length - 1);
+    }
+    return e
+}
+function fetch(url, options) {
+	options = options || {
+        method: "GET"
+    };
+	return new Promise(async (resolve, reject) => {
+        let request = await sendMessage("fetch", JSON.stringify({"url": url, "options": options}))
+
+        const response = () => ({
+            ok: ((request.status / 100) | 0) == 2, // 200-299
+            statusText: request.statusText,
+            status: request.status,
+            url: request.responseURL,
+            text: () => Promise.resolve(request.responseText),
+            json: () => Promise.resolve(request.responseText).then(JSON.parse),
+            blob: () => Promise.resolve(new Blob([request.response])),
+            clone: response,
+            headers: request.headers,
+        })
+
+        if (request.ok) resolve(response());
+        else reject(response());
+        
+	});
+}""";
 
     Booru(String script) {
-        // Add url() function
         _runtime.evaluate(_internalJsCode);
+
+        _runtime.onMessage("fetch", (args) async {
+            Uri url = Uri.parse(args["url"]);
+            Map options = args["options"];
+            Map<String, String> headers = (options["headers"] as Map<dynamic, dynamic>).map((key, value) => MapEntry("$key", "$value"));
+            http.Response response;
+
+            switch(options["method"]) {
+                case "GET":
+                response = await http.get(url, headers: headers);
+                break;
+                case "POST":
+                response = await http.post(url, headers: headers, body: options["body"]);
+                break;
+                case "PUT":
+                response = await http.put(url, headers: headers, body: options["body"]);
+                break;
+                case "DELETE":
+                response = await http.delete(url, headers: headers);
+                break;
+                default:
+                throw Exception("Invalid method");
+            }
+
+            final json = {
+                "ok": response.statusCode >= 200 && response.statusCode < 300,
+                "status": response.statusCode,
+                "statusText": response.reasonPhrase,
+                "headers": jsonEncode(response.headers),
+                "body": response.body,
+                "responseURL": response.request!.url.toString(),
+                "responseText": response.body,
+            };
+
+            return json;
+        });
 
         // eval script
         _runtime.evaluate(script);
@@ -25,7 +95,6 @@ class Booru extends Extension {
 
     JsEvalResult runtimeEval(String code) => _runtime.evaluate(code);
     Future<JsEvalResult> runtimeEvalAsync(String code) async {       
-        await _runtime.enableFetch();
         _runtime.enableHandlePromises(); 
 
         var asyncResult = await _runtime.evaluateAsync(code);
@@ -78,7 +147,7 @@ class Booru extends Extension {
         return result;
     }
 
-    Future<List<BooruPost>> getPosts({int page = 1, int limit = 20, String search = "", String auth = ""}) async {
+    Future<List<BooruPost>> getPosts({int page = 1, int limit = 20, String search = "", String auth = ":"}) async {
         String code = getJsFunc("GetPosts", {"page": page, "limit": limit, "search": search, "auth": auth});
         JsEvalResult posts = await runtimeEvalAsync(code);
         String json = posts.stringResult.replaceAll("\\\"", "\"");
@@ -86,6 +155,8 @@ class Booru extends Extension {
         if (Platform.isMacOS || Platform.isIOS) {
             json = json.substring(0, json.length - 1).substring(1).replaceAll("\\\"", "\"");
         }
+
+        await Future.delayed(Duration(milliseconds: rateLimit ?? 10));
 
         List<dynamic> decoded = jsonDecode(json);
         return decoded.map((e) => BooruPost.map(e)).toList();
