@@ -53,6 +53,8 @@ dependencies:
   pasteboard: ^0.2.0
   http: ^0.13.6
   grouped_list: ^5.1.2
+  badges: ^3.1.1
+  file_picker: ^5.2.10
 
 dev_dependencies:
   flutter_test:
