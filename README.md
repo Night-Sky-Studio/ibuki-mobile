@@ -11,7 +11,7 @@
 
 ---
 ## What is the difference?
-Unlike all the Booru applications out there where developer decided beforehand which Boorus are available to user, **Ibuki** is highly customizeable. You can yourself add whatever Booru out there to the **Ibuki** and it will display pictures from that Booru and retain full functionality (as long that Booru has a public REST API, of course). The application consumes a script file that has only one purpose - connect to the Booru API and return objects so even you with a bit of time can grab a Booru from *booru.org* and create a wrapper script for its API.
+Unlike all the Booru applications out there where developer decided beforehand which Boorus are available to user, **Ibuki** is highly customizable. You can yourself add whatever Booru out there to the **Ibuki** and it will display pictures from that Booru and retain full functionality (as long that Booru has a public REST API, of course). The application consumes a script file that has only one purpose - connect to the Booru API and return objects so even you with a bit of time can grab a Booru from *booru.org* and create a wrapper script for its API.
 
 ---
 ## Contribution

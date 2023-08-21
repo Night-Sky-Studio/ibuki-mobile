@@ -12,7 +12,8 @@ import 'application.dart';
 void main() async {
     await GetStorage.init();
     Settings settings = Settings();
-    await settings.init(null);
+    // await settings.init(null);
+    if (!(await settings.tryLoad())) await settings.init(null);
 
     if (Platform.isAndroid) {
         AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
@@ -48,9 +49,6 @@ void main() async {
             await windowManager.show();
             await windowManager.focus();
         });
-
-
-
     }
 
     runApp(Application(settings: settings));

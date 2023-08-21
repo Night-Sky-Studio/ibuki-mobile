@@ -9,9 +9,8 @@ import 'package:ibuki/classes/extension/types.dart';
 import 'package:ibuki/classes/settings.dart';
 import 'package:ibuki/pages/image_viewer_page.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import 'package:window_manager/window_manager.dart';
 
-class DashboardPage extends HookWidget with WindowListener {
+class DashboardPage extends HookWidget {
     DashboardPage({super.key, required this.settings, this.search = "", this.onSearchChanged});
     final Settings settings;
     final String search;
@@ -24,19 +23,10 @@ class DashboardPage extends HookWidget with WindowListener {
     final columnCount = useState(3);
 
     @override
-    void onWindowResize() async {
-        final width = (await WindowManager.instance.getBounds()).width;
-
-        columnCount.value = _calcColumnsCount(width);
-    }
-
-    @override
     Widget build(BuildContext context) {        
         List<BooruPost> posts = [];
         final streamController = useStreamController();
         final isMounted = useIsMounted();
-
-        windowManager.addListener(this);
 
         Future<void> fetchPage(int page) async {
             final items = await settings.activeBooru.getPosts(page: page, search: search);
@@ -57,14 +47,6 @@ class DashboardPage extends HookWidget with WindowListener {
         fetchPage(page++);
         fetchPage(page);
 
-        //columnCount.value = _calcColumnsCount(MediaQuery.of(context).size.width);
-        
-        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-            onWindowResize();
-        } else {
-            //columnCount.value = _calcColumnsCount(MediaQuery.of(context).size.width);
-        }
-
         return StreamBuilder(
             stream: streamController.stream,
             builder: (context, snapshot) {
@@ -78,7 +60,7 @@ class DashboardPage extends HookWidget with WindowListener {
                     child: CustomScrollView(
                         slivers: [
                             SliverGrid(
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3/*columnCount.value*/),
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: _calcColumnsCount(MediaQuery.of(context).size.width)),
                                 delegate: SliverChildBuilderDelegate((context, index) {
                                     try {
                                         return Card(

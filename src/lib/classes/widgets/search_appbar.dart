@@ -7,11 +7,11 @@ import 'package:ibuki/classes/settings.dart';
 import 'package:ibuki/classes/widgets/tag_widgets.dart';
 
 class _PreferredAppBarSize extends Size {
-  _PreferredAppBarSize(this.toolbarHeight, this.bottomHeight)
-    : super.fromHeight((toolbarHeight ?? kToolbarHeight) + (bottomHeight ?? 0));
+    _PreferredAppBarSize(this.toolbarHeight, this.bottomHeight)
+        : super.fromHeight((toolbarHeight ?? kToolbarHeight) + (bottomHeight ?? 0));
 
-  final double? toolbarHeight;
-  final double? bottomHeight;
+    final double? toolbarHeight;
+    final double? bottomHeight;
 }
 
 
@@ -26,6 +26,7 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
         this.initialValue,
         this.toolbarHeight, 
         this.bottom, 
+        this.visible,
     });
     
     final Widget? leading;
@@ -34,6 +35,7 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
     final Settings settings;
     final double? toolbarHeight;
     final PreferredSizeWidget? bottom;
+    final bool? visible;
     final Function(BuildContext, List<Tag>)? onSearch;
     final Function(BuildContext context)? onSearchClear;
 
@@ -43,6 +45,7 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
         final searchActive = useState(false);
         final search = useState("");
         final searchQuery = useState<List<Tag>>([]);
+        final animationController = useAnimationController(duration: const Duration(milliseconds: 250), initialValue: 0.0);
 
         if (initialValue != null && searchQuery.value.isEmpty) {
             // search.value = initialValue!.tagName;
@@ -89,31 +92,41 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
             onEditingComplete: () => searchFinished(context),
         );
 
-        return AppBar(
-            leading: leading,
-            title: searchActive.value ? chipInput : Text(search.value.isNotEmpty ? search.value : title ??  ""),
-            actions: [
-                IconButton(
-                    onPressed: () => searchFinished(context),
-                    icon: const Icon(Icons.search)
-                ),
-                Visibility(
-                    visible: searchQuery.value.isNotEmpty || search.value.isNotEmpty || searchActive.value,
-                    child: IconButton(
-                        onPressed: () {
-                            searchActive.value = false;
-                            if (searchQuery.value.isNotEmpty || search.value.isNotEmpty) {
-                                searchQuery.value = [];
-                                search.value = "";
-                            }
-                            onSearchClear?.call(context);
-                            //title = settings.activeBooru.name ?? "Ibuki";
-                        }, 
-                        icon: const Icon(Icons.close)
+        visible ?? true ? animationController.reverse() : animationController.forward();
+
+        return SlideTransition(
+            position: Tween<Offset>(
+                begin: Offset.zero,
+                end: const Offset(0, -1)
+            ).animate(
+                CurvedAnimation(parent: animationController, curve: Curves.fastOutSlowIn)
+            ),
+            child: AppBar(
+                leading: leading,
+                title: searchActive.value ? chipInput : Text(search.value.isNotEmpty ? search.value : title ??  ""),
+                actions: [
+                    IconButton(
+                        onPressed: () => searchFinished(context),
+                        icon: const Icon(Icons.search)
+                    ),
+                    Visibility(
+                        visible: searchQuery.value.isNotEmpty || search.value.isNotEmpty || searchActive.value,
+                        child: IconButton(
+                            onPressed: () {
+                                searchActive.value = false;
+                                if (searchQuery.value.isNotEmpty || search.value.isNotEmpty) {
+                                    searchQuery.value = [];
+                                    search.value = "";
+                                }
+                                onSearchClear?.call(context);
+                                //title = settings.activeBooru.name ?? "Ibuki";
+                            }, 
+                            icon: const Icon(Icons.close)
+                        )
                     )
-                )
-            ],
-            backgroundColor: searchActive.value ? const Color(0xFF303030) : null,
+                ],
+                backgroundColor: searchActive.value ? const Color(0xFF303030) : null,
+            ),
         );
     }
     

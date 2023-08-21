@@ -2,12 +2,14 @@ import 'dart:math';
 
 import 'package:flutter_js/flutter_js.dart';
 import 'package:ibuki/classes/extension/types.dart';
+import 'package:ibuki/classes/helpers.dart';
 
 class Extension extends ExtensionObject {
     int id = Random().nextInt(999999) + 100000;
-    String? name, kind, apiType, baseUrl, tagsSeparator, version, icon;
+    String? name, kind, apiType, baseUrl, tagsSeparator, icon;
     int? rateLimit;
     bool? networkAccess;
+    Version? version;
 
     @override
     Extension({
@@ -41,7 +43,7 @@ class Extension extends ExtensionObject {
             tagsSeparator: object["tags_separator"],
             rateLimit: object["rate_limit"],
             networkAccess: object["network_access"],
-            version: object["version"],
+            version: Version.fromString(object["version"]),
             icon: object["icon"]
         );
     }
@@ -69,16 +71,16 @@ class Extension extends ExtensionObject {
         tagsSeparator = map["tags_separator"];
         rateLimit = map["rate_limit"];
         networkAccess = map["network_access"];
-        version = map["version"];
+        version = Version.fromString(map["version"]);
         icon = map["icon"];
     }
 
     bool isEmpty() {
-        return name == null || kind == null || apiType == null || baseUrl == null || tagsSeparator == null || rateLimit == null || networkAccess == null;
+        return name == null || kind == null || apiType == null || baseUrl == null || tagsSeparator == null || rateLimit == null || networkAccess == null || version == null || icon == null;
     }
 
     @override
     String toString() {
-        return "{name: $name, kind: $kind, apiType: $apiType, baseUrl: $baseUrl, tagsSeparator: $tagsSeparator, rateLimit: $rateLimit, networkAccess: $networkAccess}";
+        return "{name: $name, kind: $kind, apiType: $apiType, baseUrl: $baseUrl, tagsSeparator: $tagsSeparator, rateLimit: $rateLimit, networkAccess: $networkAccess, version: $version}";
     }
 }
