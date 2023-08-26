@@ -1,5 +1,6 @@
 <div align="center">
-    <img src="docs/img/Ibuki logo.png" alt="Ibuki" height="256px"></img>
+    <img src="docs/img/Tile Black@2x.png#gh-dark-mode-only" alt="Ibuki" height="256px"></img>
+    <img src="docs/img/Tile White@2x.png#gh-light-mode-only" alt="Ibuki" height="256px"></img>
 </div>
 <h1 align="center">Ibuki</h1>
 <p align="center">An ultimate, fully customizable Booru browser app. Now on your phone.</p>
