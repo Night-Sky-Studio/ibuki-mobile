@@ -2,7 +2,7 @@ import 'package:flutter_js/flutter_js.dart';
 import 'package:ibuki/classes/extension/types.dart';
 import 'package:ibuki/classes/datetime_extensions.dart';
 
-class BooruPost extends Comparable {   
+class BooruPost implements Comparable {   
     late int id;
     late String previewFileUrl;
     late String largeFileUrl;
