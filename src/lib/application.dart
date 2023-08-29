@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ibuki/classes/settings.dart';
 import 'package:ibuki/pages/main_page.dart';
@@ -27,8 +26,7 @@ class Application extends StatelessWidget {
             darkTheme: ThemeData(
                 colorScheme: ColorScheme.fromSwatch(
                     primarySwatch: accent, 
-                    accentColor: accent, 
-                    primaryColorDark: accent,
+                    accentColor: accent,
                     cardColor: accent,
                     brightness: Brightness.dark, 
                     // backgroundColor: Colors.transparent

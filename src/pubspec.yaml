@@ -47,7 +47,6 @@ dependencies:
   media_store_plus: ^0.0.7
   chips_input: ^0.1.0
   window_manager: ^0.3.4
-#   flutter_acrylic: ^1.1.0
   visibility_detector: ^0.4.0+2
   device_info_plus: ^8.2.2
   pasteboard: ^0.2.0
@@ -55,7 +54,10 @@ dependencies:
   grouped_list: ^5.1.2
   badges: ^3.1.1
   file_picker: ^5.2.10
-
+  media_kit: ^1.1.5
+  media_kit_video: ^1.0.2
+  media_kit_libs_video: ^1.0.1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
