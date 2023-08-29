@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.19.0 <3.0.0'
+  sdk: '>=3.0.0 <3.13.1'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,7 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_hooks: ^0.18.5+1
-  flutter_js: ^0.6.0
+  flutter_js: ^0.8.0
   path_provider: ^2.0.12
   get_storage: ^2.0.3
   cached_network_image: ^3.2.0
@@ -47,15 +47,17 @@ dependencies:
   media_store_plus: ^0.0.7
   chips_input: ^0.1.0
   window_manager: ^0.3.4
-#   flutter_acrylic: ^1.1.0
   visibility_detector: ^0.4.0+2
   device_info_plus: ^8.2.2
   pasteboard: ^0.2.0
-  http: ^0.13.6
+  http: ^1.0.0
   grouped_list: ^5.1.2
   badges: ^3.1.1
   file_picker: ^5.2.10
-
+  media_kit: ^1.1.5
+  media_kit_video: ^1.0.2
+  media_kit_libs_video: ^1.0.1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -23,7 +23,7 @@ Widget processIcon(String? icon, {double? size}) {
     return Image.memory(const Base64Decoder().convert(icon), height: size);
 }
 
-class Version extends Comparable<Version> {
+class Version implements Comparable<Version> {
     int major = 0;
     int minor = 0;
     int patch = 0;

@@ -1,16 +1,9 @@
-import 'dart:convert';
-import 'package:chips_input/chips_input.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:ibuki/classes/extension/booru.dart';
-import 'package:ibuki/classes/extension/booru_post.dart';
 import 'package:ibuki/classes/extension/types.dart';
 import 'package:ibuki/classes/helpers.dart';
 import 'package:ibuki/classes/settings.dart';
 import 'package:ibuki/classes/widgets/search_appbar.dart';
-import 'package:ibuki/classes/widgets/tag_widgets.dart';
 import 'package:ibuki/pages/dashboard_page.dart';
 import 'package:ibuki/pages/more_page.dart';
 
@@ -33,7 +26,7 @@ class MainPage extends HookWidget {
 
         final appBarVisible = useState(true);
 
-        final debugString = useState("");
+        // final debugString = useState("");
 
         if (searchRequest != null && !requestFulfilled.value) {
             search.value = searchRequest!.tagName;
