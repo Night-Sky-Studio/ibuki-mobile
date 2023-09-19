@@ -45,11 +45,11 @@ class Settings {
     int limit = 20;
     int activeBooruIdx = -1;
 
-    Booru get activeBooru => _setOrResetActiveBooru(); //_setOrResetActiveBooru();
+    Booru? get activeBooru => _setOrResetActiveBooru(); //_setOrResetActiveBooru();
 
-    Booru _setOrResetActiveBooru() {
+    Booru? _setOrResetActiveBooru() {
         final result = boorus.elementAtOrNull(activeBooruIdx);
-        if (result == null) {
+        if (result == null && boorus.isNotEmpty) {
             activeBooruIdx = 0;
             return boorus[0];
         }

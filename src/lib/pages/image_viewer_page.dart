@@ -186,7 +186,7 @@ class ImageViewerPage extends HookWidget {
                                             }
 
                                             if(dir != null) {
-                                                String savePath = "${dir.path}/Ibuki/${settings.activeBooru.name!}/${image.id}.${image.postInformation.fileExtension}";
+                                                String savePath = "${dir.path}/Ibuki/${settings.activeBooru?.name!}/${image.id}.${image.postInformation.fileExtension}";
 
                                                 try {
                                                     await Dio(BaseOptions(headers: {"User-Agent": "IbukiMobile/1.0.0 Ibuki/1.0.0 (Night Sky Studio)"})).download(
@@ -205,9 +205,9 @@ class ImageViewerPage extends HookWidget {
                                                     );
 
                                                     if (Platform.isAndroid) {
-                                                        MediaStore.appFolder = "Ibuki/${settings.activeBooru.name!}/";
+                                                        MediaStore.appFolder = "Ibuki/${settings.activeBooru?.name!}/";
                                                         var store = MediaStore();
-                                                        bool result = await store.saveFile(tempFilePath: savePath, dirType: DirType.download, dirName: DirName.download, relativePath: "Ibuki/${settings.activeBooru.name!}/");
+                                                        bool result = await store.saveFile(tempFilePath: savePath, dirType: DirType.download, dirName: DirName.download, relativePath: "Ibuki/${settings.activeBooru?.name!}/");
                                                         debugPrint("$result");
                                                     }
 

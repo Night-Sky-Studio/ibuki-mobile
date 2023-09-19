@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ibuki/classes/settings.dart';
+import 'package:ibuki/pages/extensions_page.dart';
 import 'package:ibuki/pages/main_page.dart';
+import 'package:ibuki/pages/more_page.dart';
 
 class Application extends StatelessWidget {
     const Application({super.key, required this.settings});
@@ -34,10 +36,15 @@ class Application extends StatelessWidget {
                 ),
                 pageTransitionsTheme: const PageTransitionsTheme(builders: { TargetPlatform.android: CupertinoPageTransitionsBuilder() }),
             ),
-            home: GestureDetector(
-                child: MainPage(settings: settings),
+            // home: GestureDetector(
+            //     child: MainPage(settings: settings),
                 
-            ),
+            // ),
+            routes: {
+                "/": (context) => MainPage(settings: settings),
+                "/more": (context) => MorePage(settings: settings),
+                "/extensions": (context) => ExtensionsPage(settings: settings),
+            },
             debugShowCheckedModeBanner: false
         );
     }

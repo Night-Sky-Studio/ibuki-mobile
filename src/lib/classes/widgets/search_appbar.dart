@@ -53,7 +53,7 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
 
         Future<List<Tag>?> searchTag(String query) async {
             final booru = settings.activeBooru;
-            final tags = await booru.getTagSuggestion(search: query, limit: 10);
+            final tags = await booru?.getTagSuggestion(search: query, limit: 10);
             return tags;
         }
 
