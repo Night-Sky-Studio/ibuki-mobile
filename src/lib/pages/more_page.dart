@@ -15,7 +15,7 @@ class MorePage extends HookWidget {
 
         return ListView(
             children: [
-                Row(children: const [
+                const Row(children: [
                     Padding(padding: EdgeInsets.only(right: 16), child: Image(image: AssetImage("assets/images/logo_150px@2x.png"), width: 160)),
                     Text("Ibuki", style: TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold))
                 ]),

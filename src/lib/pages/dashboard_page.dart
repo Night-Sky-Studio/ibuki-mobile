@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:ibuki/classes/extension/booru_post.dart';
 import 'package:ibuki/classes/extension/types.dart';
 import 'package:ibuki/classes/settings.dart';
+import 'package:ibuki/classes/widgets/ibuki_error_widget.dart';
 import 'package:ibuki/pages/image_viewer_page.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -26,9 +27,11 @@ class DashboardPage extends HookWidget {
         final isMounted = useIsMounted();
 
         Future<void> fetchPage(int page) async {
-            final items = await settings.activeBooru.getPosts(page: page, search: search);
-            posts.addAll(items);
-            streamController.sink.add(posts);
+            if (settings.activeBooru != null) {
+                final items = await settings.activeBooru!.getPosts(page: page, search: search);
+                posts.addAll(items);
+                streamController.sink.add(posts);
+            }
         }
 
         int page = 1;
@@ -41,10 +44,21 @@ class DashboardPage extends HookWidget {
         //     }
         // });
 
-        fetchPage(page++);
+        fetchPage(++page);
         fetchPage(page);
 
-        return StreamBuilder(
+        return settings.boorus.isEmpty 
+        ? IbukiErrorWidget(
+            type: ErrorType.noExtensions, 
+            message: "No extensions installed!", 
+            body: "Go to [More] -> [Extensions] and install at least one extension.",
+            actions: [
+                ElevatedButton(child: const Text("Extensions"), onPressed: () {
+                    Navigator.of(context).pushNamed("/extensions");
+                })
+            ]
+        )
+        : StreamBuilder(
             stream: streamController.stream,
             builder: (context, snapshot) {
                 return RefreshIndicator(

@@ -41,7 +41,7 @@ dependencies:
   get_storage: ^2.0.3
   cached_network_image: ^3.2.0
   sliding_up_panel: ^2.0.0+1
-  share_plus: ^6.3.1
+  share_plus: ^7.1.0
   dio: ^5.1.1
   permission_handler: ^10.2.0
   media_store_plus: ^0.0.7
@@ -54,9 +54,10 @@ dependencies:
   grouped_list: ^5.1.2
   badges: ^3.1.1
   file_picker: ^5.2.10
-  media_kit: ^1.1.5
-  media_kit_video: ^1.0.2
-  media_kit_libs_video: ^1.0.1
+  media_kit: ^1.1.7                              # Primary package.
+  media_kit_video: ^1.1.8                        # For video rendering.
+  media_kit_libs_video: ^1.0.1                   # Native video dependencies.
+  flutter_svg: ^2.0.7
   
 dev_dependencies:
   flutter_test:
@@ -84,6 +85,9 @@ flutter:
     - assets/scripts/Danbooru.js
     - assets/scripts/Safebooru.js
     - assets/images/logo_150px@2x.png
+    - assets/images/errors/NoInternet 1.svg
+    - assets/images/errors/NoInternet 2.svg
+    - assets/images/errors/NoInternet 3.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -18,7 +18,7 @@ class MainPage extends HookWidget {
         // find index of active booru using id from settings and list of loaded boorus
         final activeBooru = useState(settings.activeBooruIdx);
 
-        final title = useState(settings.activeBooru.name ?? "Ibuki");
+        final title = useState(settings.activeBooru?.name ?? "Ibuki");
         final search = useState("");
         final searchOverride = useState<Tag?>(null);
 
@@ -76,7 +76,7 @@ class MainPage extends HookWidget {
                 },
                 onSearchClear: (context) {
                     search.value = "";
-                    title.value = settings.activeBooru.name ?? "Ibuki";
+                    title.value = settings.activeBooru?.name ?? "Ibuki";
                     searchOverride.value = null;
                 }
             ),
@@ -98,7 +98,7 @@ class MainPage extends HookWidget {
                         title.value = "Ibuki";
                         appBarVisible.value = false;
                     } else {
-                        title.value = settings.activeBooru.name ?? "Ibuki";
+                        title.value = settings.activeBooru?.name ?? "Ibuki";
                         appBarVisible.value = true;
                     }
                 },
@@ -114,7 +114,7 @@ class MainPage extends HookWidget {
                                     decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
                                     child: Container(
                                         alignment: Alignment.bottomLeft,
-                                        child: Row(children: const [
+                                        child: const Row(children: [
                                             Padding(padding: EdgeInsets.only(right: 16),child: Image(image: AssetImage("assets/images/logo_150px@2x.png"), width: 96)),
                                             Text("Ibuki", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold))
                                         ],)

@@ -87,6 +87,8 @@ class BooruPost implements Comparable {
         );
     }   
 
+    bool isVideo() => ["avif", "mp4", "webm", "avi", "mov", "m4v", "mpeg"].contains(postInformation.fileExtension);
+
     @override
     String toString() => "BooruPost(id: $id, previewFileUrl: $previewFileUrl, largeFileUrl: $largeFileUrl, directUrl: $directUrl, postTags: $postTags, postInformation: $postInformation)";
 
