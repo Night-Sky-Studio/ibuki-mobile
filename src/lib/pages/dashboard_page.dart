@@ -44,8 +44,8 @@ class DashboardPage extends HookWidget {
         //     }
         // });
 
-        fetchPage(++page);
-        fetchPage(page);
+        fetchPage(page++);
+        fetchPage(page++);
 
         return settings.boorus.isEmpty 
         ? IbukiErrorWidget(
@@ -66,7 +66,7 @@ class DashboardPage extends HookWidget {
                         page = 1;
                         posts.clear();
                         await fetchPage(page++);
-                        await fetchPage(page);
+                        await fetchPage(page++);
                     }, 
                     child: CustomScrollView(
                         slivers: [
@@ -89,7 +89,7 @@ class DashboardPage extends HookWidget {
                                                                 currentIndex: index, 
                                                                 // placeholder: NetworkImage(posts[index].previewFileUrl),
                                                                 onEndReached: () async {
-                                                                    await fetchPage(++page);
+                                                                    await fetchPage(page++);
                                                                 },
                                                             )
                                                         )
@@ -123,9 +123,9 @@ class DashboardPage extends HookWidget {
                                     child: VisibilityDetector(
                                         key: const  Key("page_end"),
                                         child: const CircularProgressIndicator(value: null),
-                                        onVisibilityChanged: (info) {
+                                        onVisibilityChanged: (info) async {
                                             if (info.visibleFraction > 0) {
-                                                fetchPage(++page);
+                                                await fetchPage(page++);
                                                 debugPrint("Current Page: $page");
                                             }
                                         },

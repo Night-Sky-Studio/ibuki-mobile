@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ibuki/classes/settings.dart';
-import 'package:media_kit/media_kit.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:window_manager/window_manager.dart';
 import 'application.dart';
@@ -51,8 +50,6 @@ void main() async {
             await windowManager.focus();
         });
     }
-
-    MediaKit.ensureInitialized();
 
     runApp(Application(settings: settings));
 }
