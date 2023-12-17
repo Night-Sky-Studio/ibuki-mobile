@@ -1,4 +1,4 @@
-/// <reference path="./API.d.ts" />
+/// <reference path="../API.d.ts" />
 
 const Extension = {
     name: "Danbooru",
@@ -8,12 +8,11 @@ const Extension = {
     tags_separator: " ",
     rate_limit: 10,
     network_access: true,
-    version: "1.0.0",
+    version: "1.0.0.1",
     icon: "https://danbooru.donmai.us/packs/static/images/danbooru-logo-128x128-ea111b6658173e847734.png"
 }
 
 /// Helpers
-
 function MakeTagsFromTagsString(string, separator, space, type) {
     if (string == "" || string == null || string == undefined) return null
     let tags = string.split(separator)
@@ -28,11 +27,19 @@ function MakeTagsFromTagsString(string, separator, space, type) {
 }
 
 function ParsePostJSON(json) {
+    const isNullOrUndefined = (property) => property == null || property == undefined
+
     try {
         if (typeof(json) !== typeof(JSON)) json = JSON.parse(json)
         
         // When the required by Ibuki fields are empty - don't add this post to the returnable array
-        if (json.id == undefined || json.preview_file_url == undefined || json.large_file_url == undefined || json.is_deleted == true || json.is_banned == true) 
+        if (
+                isNullOrUndefined(json.id) 
+            || isNullOrUndefined(json.preview_file_url) 
+            || isNullOrUndefined(json.large_file_url) 
+            || json.is_deleted == true 
+            || json.is_banned == true
+        ) 
             return null
         
         return {
@@ -48,7 +55,7 @@ function ParsePostJSON(json) {
                 ArtistTags: MakeTagsFromTagsString(json.tag_string_artist, Extension.tags_separator, "_", "artist"),
                 LoreTags: null,
                 GeneralTags: MakeTagsFromTagsString(json.tag_string_general, Extension.tags_separator, "_", "general"),
-                MetaTags: MakeTagsFromTagsString(json.tag_string_meta, Extension.tags_separator, "_", "meta"),
+                MetaTags: MakeTagsFromTagsString(json.tag_string_meta, Extension.tags_separator, "_", "meta")
             },
             Information: {
                 UploaderID: json.uploader_id,
@@ -102,11 +109,6 @@ function ParseTagJSON(json) {
     try {
         if (typeof(json) !== typeof(JSON)) json = JSON.parse(json) 
 
-        if (
-            json.post_count != undefined && json.post_count == 0 ||
-            json.is_deprecated != undefined && json.is_deprecated == true
-        ) return null
-
         return {
             Name: json.name,
             DisplayName: json.name.replace("_", " "),
@@ -120,7 +122,11 @@ function ParseTagJSON(json) {
 
 /// Main implementation 
 
-async function GetPosts({page = 1, limit = 20, search = "", auth = ""}) {
+async function GetPosts({page = 1, limit = 20, search = "", auth = ":"}) {
+    const user = {
+        name: auth.split(":")[0],
+        key: auth.split(":")[1]
+    }
     let posts = await (await fetch(url({
         base: Extension.base_url,
         path: "posts.json",
@@ -128,7 +134,8 @@ async function GetPosts({page = 1, limit = 20, search = "", auth = ""}) {
             { "page": page },
             { "limit": limit },
             { "tags": search },
-            { "auth": auth }
+            { "login": user.name },
+            { "api_key": user.key }
         ]
     }), {
         method: "GET",
@@ -147,24 +154,30 @@ async function GetPosts({page = 1, limit = 20, search = "", auth = ""}) {
     return JSON.stringify(result)
 }
 
-async function GetUserFavorites({page = 1, limit = 20, username = "", auth = ""}) {
+async function GetUserFavorites({page = 1, limit = 20, username = "", auth = ":"}) {
     return await GetPosts({page: page, limit: limit, search: `ordfav:${username}`, auth: auth})
 }
 
-async function GetPostChildren({id = 0, auth = ""}) {
+async function GetPostChildren({id = 0, auth = ":"}) {
     return await GetPosts({page: 1, limit: 200, search: `parent:${id} -id:${id}`, auth: auth})
 }
 
 // Page is not included, since having page switching for a 
 // tag search bar is too cumbersome...
-async function GetTagSuggestion({search = "", limit = 20}) {
+async function GetTagSuggestion({search = "", limit = 20, auth = ":"}) {
+    const user = {
+        name: auth.split(":")[0],
+        key: auth.split(":")[1]
+    }
     let tags = await (await fetch(url({
         base: Extension.base_url,
         path: "tags.json",
         query: [
             { "search[name_matches]": `${search}*` },
             { "limit": limit },
-            { "search[order]": "count" }
+            { "search[order]": "count" },
+            { "login": user.name },
+            { "api_key": user.key }
         ]
     }), {
         method: "GET",

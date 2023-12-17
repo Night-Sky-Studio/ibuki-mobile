@@ -23,12 +23,20 @@ class DashboardPage extends HookWidget {
         List<BooruPost> posts = [];
         final streamController = useStreamController();
         final isMounted = useIsMounted();
+        bool pageEndVisible = true;
+        bool isLoading = false;
 
         Future<void> fetchPage(int page) async {
-            if (settings.activeBooru != null) {
+            if (settings.activeBooru != null && !isLoading) {
+                isLoading = true;
+                debugPrint("Fetching page $page");    
                 final items = await settings.activeBooru!.getPosts(page: page, search: search);
+                if (items.isEmpty) {
+                    pageEndVisible = false;
+                }
                 posts.addAll(items);
                 streamController.sink.add(posts);
+                isLoading = false;
             }
         }
 
@@ -42,9 +50,9 @@ class DashboardPage extends HookWidget {
         //     }
         // });
 
-        fetchPage(page).then((_) async {
-            page++;
-            await fetchPage(page++);
+        fetchPage(1).then((_) async {
+            await fetchPage(2);
+            page = 3;
         });
         
 
@@ -123,11 +131,11 @@ class DashboardPage extends HookWidget {
                                     padding: const EdgeInsets.all(16.0),
                                     child: VisibilityDetector(
                                         key: const  Key("page_end"),
-                                        child: const CircularProgressIndicator(value: null),
+                                        child: Visibility(visible: pageEndVisible, child: const CircularProgressIndicator(value: null)),
                                         onVisibilityChanged: (info) async {
                                             if (info.visibleFraction > 0) {
                                                 await fetchPage(page++);
-                                                debugPrint("Current Page: $page");
+                                                // debugPrint("Current Page: $page");
                                             }
                                         },
                                     ),
