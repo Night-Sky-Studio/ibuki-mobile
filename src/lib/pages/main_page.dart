@@ -17,10 +17,11 @@ class MainPage extends HookWidget {
         final selectedIndex = useState(0);
         // find index of active booru using id from settings and list of loaded boorus
         final activeBooru = useState(settings.activeBooruIdx);
-
-        final title = useState(settings.activeBooru?.name ?? "Ibuki");
+        
         final search = useState("");
         final searchOverride = useState<Tag?>(null);
+
+        final title = useState(search.value.isEmpty ? settings.activeBooru?.name ?? "Ibuki" : search.value);
 
         final requestFulfilled = useState(false);
 
@@ -72,12 +73,11 @@ class MainPage extends HookWidget {
                 settings: settings, 
                 onSearch: (context, tags) {
                     search.value = Tag.tagListToString(tags);
-                    final newTitle = Tag.tagListToString(tags);
-                    title.value = newTitle.isEmpty ? settings.activeBooru?.name ?? "Ibuki" : newTitle;
+                    title.value = search.value.isEmpty ? settings.activeBooru?.name ?? "Ibuki" : search.value;
                 },
                 onSearchClear: (context) {
                     search.value = "";
-                    title.value = settings.activeBooru?.name ?? "Ibuki";
+                    title.value = search.value.isEmpty ? settings.activeBooru?.name ?? "Ibuki" : search.value;
                     searchOverride.value = null;
                 }
             ),
@@ -99,7 +99,7 @@ class MainPage extends HookWidget {
                         title.value = "Ibuki";
                         appBarVisible.value = false;
                     } else {
-                        title.value = settings.activeBooru?.name ?? "Ibuki";
+                        title.value = search.value.isEmpty ? settings.activeBooru?.name ?? "Ibuki" : search.value;
                         appBarVisible.value = true;
                     }
                 },
