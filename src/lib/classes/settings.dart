@@ -12,9 +12,10 @@ import 'package:http/http.dart' as http;
 
 class Account {
     int id = Random().nextInt(999999) + 100000;
+    int booruId;
     String username, password;
     bool isApiKey = false;
-    Account({required this.username, required this.password, this.isApiKey = false});
+    Account({required this.booruId, required this.username, required this.password, this.isApiKey = false});
 }
 
 class BooruEntry {
@@ -165,6 +166,13 @@ class Settings {
         } else {
             throw Exception("Failed to load extensions");
         }
+    }
+
+    Booru? getBooruById(int id) {
+        for (var booru in boorus) {
+            if (booru.id == id) return booru;
+        }
+        return null;
     }
 
     Future<void> save() async {

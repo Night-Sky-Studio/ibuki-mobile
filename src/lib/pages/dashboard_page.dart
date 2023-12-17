@@ -9,7 +9,7 @@ import 'package:ibuki/pages/image_viewer_page.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class DashboardPage extends HookWidget {
-    DashboardPage({super.key, required this.settings, this.search = "", this.onSearchChanged});
+    const DashboardPage({super.key, required this.settings, this.search = "", this.onSearchChanged});
     final Settings settings;
     final String search;
     final Function(List<Tag>)? onSearchChanged;
@@ -17,8 +17,6 @@ class DashboardPage extends HookWidget {
     int _calcColumnsCount(double width, {double colWidth = 160}) {
         return width ~/ colWidth;
     }
-
-    final columnCount = useState(3);
 
     @override
     Widget build(BuildContext context) {        
@@ -44,8 +42,11 @@ class DashboardPage extends HookWidget {
         //     }
         // });
 
-        fetchPage(page++);
-        fetchPage(page++);
+        fetchPage(page).then((_) async {
+            page++;
+            await fetchPage(page++);
+        });
+        
 
         return settings.boorus.isEmpty 
         ? IbukiErrorWidget(

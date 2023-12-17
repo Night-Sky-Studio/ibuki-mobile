@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ibuki/classes/settings.dart';
-import 'package:ibuki/pages/extensions_page.dart';
+import 'package:ibuki/pages/more/extensions_page.dart';
 import 'package:ibuki/pages/main_page.dart';
 import 'package:ibuki/pages/more_page.dart';
 

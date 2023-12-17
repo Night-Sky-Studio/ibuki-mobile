@@ -72,7 +72,8 @@ class MainPage extends HookWidget {
                 settings: settings, 
                 onSearch: (context, tags) {
                     search.value = Tag.tagListToString(tags);
-                    title.value = Tag.tagListToString(tags);
+                    final newTitle = Tag.tagListToString(tags);
+                    title.value = newTitle.isEmpty ? settings.activeBooru?.name ?? "Ibuki" : newTitle;
                 },
                 onSearchClear: (context) {
                     search.value = "";
