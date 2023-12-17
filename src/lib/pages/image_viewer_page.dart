@@ -86,7 +86,13 @@ class Viewer extends HookWidget {
         });
         final downloadProgress = useState<double?>(null);
         final isMounted = useIsMounted();
-        final webViewController = useWebViewController(image.originalFileURL);
+
+        late final WebViewController webViewController;
+
+        if (image.isVideo() && Platform.isAndroid || Platform.isIOS){
+            webViewController = useWebViewController(image.originalFileURL);
+        }
+
         final panelController = PanelController();
 
         SnackBar makeSnackbar(String text) {
@@ -318,7 +324,7 @@ class Viewer extends HookWidget {
                 body: image.isVideo() 
                 ? Container(
                     margin: EdgeInsets.only(bottom: /*Theme.of(context).platform == TargetPlatform.iOS ? 168 :*/ Platform.isAndroid ? 168 : 120),//144), 
-                    child: WebViewWidget(controller: webViewController)
+                    child: Platform.isWindows || Platform.isMacOS || Platform.isLinux ? const Center(child: Text("Sadly, videos are not supported on Desktop platforms yet")) : WebViewWidget(controller: webViewController)
                 )
                 : InteractiveViewer(
                     boundaryMargin: const EdgeInsets.all(0),
