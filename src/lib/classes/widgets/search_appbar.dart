@@ -80,7 +80,10 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
             ),
             findSuggestions: (String query) async {
                 if (query.isNotEmpty) {
-                    final results = await searchTag(query.toLowerCase()) ?? [];
+                    var results = await searchTag(query.toLowerCase()) ?? [];
+                    if (results.isEmpty) {
+                        results = [Tag(tagName: query, type: TagType.invalid)];
+                    }
                     return results;
                 }
                 return [];
@@ -124,7 +127,7 @@ class SearchAppBar extends HookWidget implements PreferredSizeWidget {
                         )
                     )
                 ],
-                backgroundColor: searchActive.value ? const Color(0xFF303030) : null,
+                backgroundColor: searchActive.value ? const Color(0xFF303030) : Theme.of(context).colorScheme.primary,
             ),
         );
     }
